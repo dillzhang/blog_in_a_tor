@@ -1,0 +1,13 @@
+home.html
+- Login Button
+    - Username, Password Post Form
+- Create Account
+    - Username, Password, Confirm Password Post Form
+- Most recent blog posts
+    - 10 most recent blog post
+    - No comments or brief comments
+
+blogX.html
+- View of specific blog posts
+- Comments
+- Editting and removing comments
