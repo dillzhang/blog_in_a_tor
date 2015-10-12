@@ -12,9 +12,9 @@
 
 **DUE 10/19**
 
-- [ ] Finish to do list
-- [ ]
-- [ ]
+- [ ] Outline basic site
+- [ ] Outline database structure
+- [ ] 
 - [ ]
 - [ ]
 - [ ]
