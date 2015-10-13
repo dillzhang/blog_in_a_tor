@@ -7,6 +7,10 @@ home.html
     - 10 most recent blog post
     - No comments or brief comments
 
+userX.html
+-Lists the posts made
+-Modifications to account
+
 blogX.html
 - View of specific blog posts
 - Comments
