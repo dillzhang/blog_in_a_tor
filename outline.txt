@@ -1,17 +1,62 @@
 home.html
 - Login Button
     - Username, Password Post Form
+    -Redirects to home with message saying login status
 - Create Account
-    - Username, Password, Confirm Password Post Form
+    - Username, Password, Email, Confirm Password Post Form
+    - Redirects to home with message saying account status
 - Most recent blog posts
     - 10 most recent blog post
     - No comments or brief comments
 
 userX.html
 -Lists the posts made
--Modifications to account
+-Offer modifications to account
+    -Change password
+    -Change email
+    -Delete Account
 
 blogX.html
 - View of specific blog posts
 - Comments
 - Editting and removing comments
+- Editing post if author
+
+
+DATABASES
+user_info
+-User id
+-Username login name
+-Salt
+-Hash
+-Email
+
+posts
+-Post id
+-User id
+-Timestamp
+-Heading / Post[:10]
+-Post
+
+comments
+-Post id
+-User id
+-Timestamp
+-Comment
+
+Database Functions
+
+Boolean check_login(Str username, Str pass) {
+    Login or not
+}
+
+String enter_login_info(str username, str passwd, str confirmpasswd) {
+    Returns NONE if successful 
+    Returns error message if failure
+}
+
+List [heading, post] getPost(int postid) {
+    Returns the post with heading
+}
+
+List List [[timestamp, comment, user], []]
