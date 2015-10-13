@@ -14,8 +14,8 @@
 
 - [ ] Outline basic site
 - [ ] Outline database structure
+- [ ] Implement Login Server
 - [ ] 
-- [ ]
 - [ ]
 - [ ]
 - [ ]
