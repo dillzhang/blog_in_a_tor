@@ -1,9 +1,13 @@
 home.html
 - Login Button
     - Username, Password Post Form
+    - Button name should be submit
+    - Submit button value should be "login"
     -Redirects to home with message saying login status
 - Create Account
     - Username, Password, Email, Confirm Password Post Form
+    - Button name should be submit
+    - Submit button value should be "create"
     - Redirects to home with message saying account status
 - Most recent blog posts
     - 10 most recent blog post with hyperlinked postid
