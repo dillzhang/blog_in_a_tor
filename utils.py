@@ -75,10 +75,7 @@ def register_new_user(username, password, confirm_password, email):
 	return None
 
 # changes the user's hashed password in the database
-def modify_password(username, password, confirm_password, new_password):
-	# Check if the old passwords match.
-	if password != confirm_password:
-		return 'Passwords do not match.'
+def modify_password(username, password, new_password):
 	# Check if the new password is valid.
 	if len(new_password) < 8:
 		return 'Password must be at least 8 characters long.'
@@ -113,10 +110,7 @@ def modify_password(username, password, confirm_password, new_password):
 	return None
 
 # changes the user's email in the database
-def modify_email(username, password, confirm_password, new_email):
-	# Check if the passwords match.
-	if password != confirm_password:
-		return 'Passwords do not match.'
+def modify_email(username, password, new_email):
 	# Check if the new email is valid.
 	if not bool(search(
 		r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@"+
