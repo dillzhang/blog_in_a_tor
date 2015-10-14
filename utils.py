@@ -92,11 +92,12 @@ def modify_password(username, password, confirm_password, new_password):
 	TYPE = "table" AND NAME = "user_info"'
 	c.execute(q)
 	if not c.fetchone():
-		return 'User not found.'
+		return 'Incorrect username or password.'
 	# If the table does exist, check the old username and password.
 	q = 'SELECT salt, hash_value FROM user_info WHERE username = ?'
 	salt_n_hash = c.execute(q, (username,)).fetchone()
 	if not (
+		bool(salt_n_hash) and
 		sha512((password + salt_n_hash[0]) * 10000).hexdigest() == salt_n_hash[1]
 		):
 		return 'Incorrect username or password.'
@@ -127,11 +128,12 @@ def modify_email(username, password, confirm_password, new_email):
 	TYPE = "table" AND NAME = "user_info"'
 	c.execute(q)
 	if not c.fetchone():
-		return 'User not found.'
+		return 'Incorrect username or password.'
 	# If the table does exist, check the username and password.
 	q = 'SELECT salt, hash_value FROM user_info WHERE username = ?'
 	salt_n_hash = c.execute(q, (username,)).fetchone()
 	if not (
+		bool(salt_n_hash) and
 		sha512((password + salt_n_hash[0]) * 10000).hexdigest() == salt_n_hash[1]
 		):
 		return 'Incorrect username or password.'
