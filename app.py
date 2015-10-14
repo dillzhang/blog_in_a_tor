@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, session, redirect, urlfor
+from flask import Flask, render_template, request, session, redirect, url_for
 import utils
 
 app = Flask(__name__)
@@ -8,7 +8,7 @@ app = Flask(__name__)
 def home():
     if request.method == "GET":
         return render_template("home.html")
-    else if request.form["submit"] == "login":
+    elif request.form["submit"] == "login":
         username = request.form["username"]
         password = request.form["password"]
         if ( utils.check_login_info(username, password) ):
@@ -16,17 +16,17 @@ def home():
         else:
             return render_template("home.html") #Failed Login
     
-    else if request.form["submit"] == "create":
+    elif request.form["submit"] == "create":
         username = request.form["username"]
         password = request.form["password"]
         confirm_passwd = request.form["confirm_password"]
         email = request.form["email"]
         error = utils.register_new_user(username, password, confirm_password, email)
-        if (error = None):
+        if (error == None):
             return render_template("home.html") #Successful Account Creation
         else:
             return render_template("home.html") #Failed Account Creation
-
+"""
 @app.route("/blog/<postid>")
 def blog(postid=0):
     if postid <= 0:
@@ -38,7 +38,12 @@ def blog(postid=0):
 def user(userid=0):
     if userid <= 0:
         #404 Error
-    else if request.method == "GET":
+    elif request.method == "GET":
         #Find the user's information
-    else if request.method == "POST":
+    elif request.method == "POST":
         #Process Form
+"""
+if __name__ == "__main__":
+       app.debug = True
+       app.secret_key = "secret_key"
+       app.run(host="0.0.0.0", port=8000)
