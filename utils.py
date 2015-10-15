@@ -2,6 +2,7 @@ from os import urandom
 from hashlib import sha512
 from uuid import uuid4
 from re import search
+from time import time
 import sqlite3
 
 # a 32-byte key that should be used to secure the Flask session
@@ -51,7 +52,7 @@ def register_new_user(username, password, confirm_password, email):
 		return 'Email is invalid.'
 	# If the user_info table doesn't exist, create it.
 	q = 'CREATE TABLE IF NOT EXISTS user_info \
-	(id INT, username TEXT, salt INT, hash_value INT, email TEXT)'
+	(user_id INT, username TEXT, salt INT, hash_value INT, email TEXT)'
 	c.execute(q)
 	# Check if the username or email is taken.
 	q = 'SELECT username, email FROM user_info'
@@ -68,14 +69,17 @@ def register_new_user(username, password, confirm_password, email):
 	# Enter the new information and return None.
 	q = 'SELECT COUNT(*) FROM user_info'
 	num_rows = c.execute(q).fetchone()[0]
-	q = 'INSERT INTO user_info (id, username, salt, hash_value, email) \
+	q = 'INSERT INTO user_info (user_id, username, salt, hash_value, email) \
 	VALUES (?, ?, ?, ?, ?)'
 	c.execute(q, (num_rows + 1, username, salt, hash_value, email))
 	conn.commit()
 	return None
 
 # changes the user's hashed password in the database
-def modify_password(username, password, new_password):
+def modify_password(username, password, new_password, confirm_password):
+	# Check if the passwords match.
+	if new_password != confirm_password:
+		return 'Passwords do not match.'
 	# Check if the new password is valid.
 	if len(new_password) < 8:
 		return 'Password must be at least 8 characters long.'
@@ -136,3 +140,43 @@ def modify_email(username, password, new_email):
 	c.execute(q, (new_email, username))
 	conn.commit()
 	return None
+
+# enters a new post into the database
+def new_post(username, post, heading=post[:10]+'...'):
+	# If the posts table doesn't exist, create it.
+	q = 'CREATE TABLE IF NOT EXISTS posts \
+	(post_id INT, user_id INT, time REAL, heading TEXT, post TEXT)'
+	c.execute(q)
+	# Get the user_id associated with username.
+	q = 'SELECT user_id FROM user_info WHERE username = ?'
+	user_id = c.execute(q, (username,)).fetchone()
+	if not user_id:
+		'Incorrect username.'
+	# Enter the new information and return None.
+	q = 'SELECT COUNT(*) FROM posts'
+	num_rows = c.execute(q).fetchone()[0]
+	q = 'INSERT INTO posts (post_id, user_id, time, heading, post) \
+	VALUES (?, ?, ?, ?, ?)'
+	c.execute(q, (num_rows + 1, user_id, time.time(), heading, post))
+	return None
+
+# enters a new comment for the given post into the database
+def new_comment(username, post_id, comment):
+	# If the comments table doesn't exist, create it.
+	q = 'CREATE TABLE IF NOT EXISTS comments \
+	(post_id INT, user_id INT, time REAL, comment TEXT)'
+	c.execute(q)
+	# Get the user_id associated with username.
+	q = 'SELECT user_id FROM user_info WHERE username = ?'
+	user_id = c.execute(q, (username,)).fetchone()
+	if not user_id:
+		'Incorrect username.'
+	# Enter the new information and return None.
+	q = 'INSERT INTO comments (post_id, user_id, time, comment) \
+	VALUES (?, ?, ?, ?)'
+	c.execute(q, (post_id, user_id, time.time(), comment))
+	return None
+
+
+
+
