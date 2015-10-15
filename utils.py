@@ -152,31 +152,29 @@ def new_post(username, post, heading=post[:10]+'...'):
 	user_id = c.execute(q, (username,)).fetchone()
 	if not user_id:
 		'Incorrect username.'
-	# Enter the new information and return None.
+	# Enter the new information and return the new post's id.
 	q = 'SELECT COUNT(*) FROM posts'
 	num_rows = c.execute(q).fetchone()[0]
 	q = 'INSERT INTO posts (post_id, user_id, time, heading, post) \
 	VALUES (?, ?, ?, ?, ?)'
 	c.execute(q, (num_rows + 1, user_id, time.time(), heading, post))
-	return None
+	return num_rows + 1
 
 # enters a new comment for the given post into the database
 def new_comment(username, post_id, comment):
 	# If the comments table doesn't exist, create it.
 	q = 'CREATE TABLE IF NOT EXISTS comments \
-	(post_id INT, user_id INT, time REAL, comment TEXT)'
+	(comment_id INT, post_id INT, user_id INT, time REAL, comment TEXT)'
 	c.execute(q)
 	# Get the user_id associated with username.
 	q = 'SELECT user_id FROM user_info WHERE username = ?'
 	user_id = c.execute(q, (username,)).fetchone()
 	if not user_id:
 		'Incorrect username.'
-	# Enter the new information and return None.
-	q = 'INSERT INTO comments (post_id, user_id, time, comment) \
-	VALUES (?, ?, ?, ?)'
-	c.execute(q, (post_id, user_id, time.time(), comment))
-	return None
-
-
-
-
+	# Enter the new information and return the new comment's id.
+	q = 'SELECT COUNT(*) FROM comments'
+	num_rows = c.execute(q).fetchone()[0]
+	q = 'INSERT INTO comments (comment_id, post_id, user_id, time, comment) \
+	VALUES (?, ?, ?, ?, ?)'
+	c.execute(q, (num_rows + 1, post_id, user_id, time.time(), comment))
+	return num_rows + 1
