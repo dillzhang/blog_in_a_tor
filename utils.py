@@ -31,7 +31,7 @@ def check_login_info(username, password):
 		return True
 	return False
 
-# enters new login information into the database
+# enters new login information into the database, returns None or possible errors
 def register_new_user(username, password, confirm_password, email):
 	# Check if the passwords match.
 	if password != confirm_password:
@@ -75,7 +75,7 @@ def register_new_user(username, password, confirm_password, email):
 	conn.commit()
 	return None
 
-# changes the user's hashed password in the database
+# changes the user's hashed password in the database, returns None or possible errors
 def modify_password(username, password, new_password, confirm_password):
 	# Check if the passwords match.
 	if new_password != confirm_password:
@@ -113,7 +113,7 @@ def modify_password(username, password, new_password, confirm_password):
 	conn.commit()
 	return None
 
-# changes the user's email in the database
+# changes the user's email in the database, returns None or possible errors
 def modify_email(username, password, new_email):
 	# Check if the new email is valid.
 	if not bool(search(
@@ -141,7 +141,7 @@ def modify_email(username, password, new_email):
 	conn.commit()
 	return None
 
-# enters a new post into the database
+# enters a new post into the database, returns post_id or possible errors
 def new_post(username, post, heading=post[:10]+'...'):
 	# If the posts table doesn't exist, create it.
 	q = 'CREATE TABLE IF NOT EXISTS posts \
@@ -160,7 +160,7 @@ def new_post(username, post, heading=post[:10]+'...'):
 	c.execute(q, (num_rows + 1, user_id, time.time(), heading, post))
 	return num_rows + 1
 
-# enters a new comment for the given post into the database
+# enters a new comment into the database, returns comment_id or possible errors
 def new_comment(username, post_id, comment):
 	# If the comments table doesn't exist, create it.
 	q = 'CREATE TABLE IF NOT EXISTS comments \
@@ -178,3 +178,19 @@ def new_comment(username, post_id, comment):
 	VALUES (?, ?, ?, ?, ?)'
 	c.execute(q, (num_rows + 1, post_id, user_id, time.time(), comment))
 	return num_rows + 1
+
+# returns the post, heading,and timestamp from the database, or possible errors
+def get_post(post_id):
+	# If the posts table doesn't exist, return an error message.
+	q = 'SELECT name FROM sqlite_master WHERE \
+	TYPE = "table" AND NAME = "posts"'
+	c.execute(q)
+	if not c.fetchone():
+		return 'Incorrect post_id.'
+	# If the table does exist, get the information associated with post_id.
+	q = 'SELECT post, heading, time FROM posts WHERE post_id = ?'
+	info = c.execute(q, (post_id,)).fetchone()
+	if not info:
+		return 'Incorrect post_id.'
+	# Return the list [post, heading, time]
+	return info
