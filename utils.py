@@ -179,18 +179,60 @@ def new_comment(username, post_id, comment):
 	c.execute(q, (num_rows + 1, post_id, user_id, time.time(), comment))
 	return num_rows + 1
 
-# returns the post, heading,and timestamp from the database, or possible errors
+# returns the post, heading,and timestamp from the database, or None
 def get_post(post_id):
 	# If the posts table doesn't exist, return an error message.
 	q = 'SELECT name FROM sqlite_master WHERE \
 	TYPE = "table" AND NAME = "posts"'
 	c.execute(q)
 	if not c.fetchone():
-		return 'Incorrect post_id.'
-	# If the table does exist, get the information associated with post_id.
+		return None
+	# Return the list [post, heading, time]
 	q = 'SELECT post, heading, time FROM posts WHERE post_id = ?'
 	info = c.execute(q, (post_id,)).fetchone()
-	if not info:
-		return 'Incorrect post_id.'
-	# Return the list [post, heading, time]
 	return info
+
+# returns the comments, usernames, times, and comment_ids from the database, or []
+def get_comments(post_id):
+	# If the comments table doesn't exist, return an empty list.
+	q = 'SELECT name FROM sqlite_master WHERE \
+	TYPE = "table" AND NAME = "comments"'
+	c.execute(q)
+	if not c.fetchone():
+		return []
+	# Return the list of lists [comment, username, time, comment_id].
+	q = 'SELECT comments, username, time, comment_id FROM comments, user_info \
+	WHERE comments.post_id = ?, user_info.post_id = ?'
+	return c.execute(q, (post_id, post_id)).fetchall()
+
+# returns the post, heading,and timestamp from the database, or []
+def get_user_posts(username):
+	# If the posts table doesn't exist, return an empty list.
+	q = 'SELECT name FROM sqlite_master WHERE \
+	TYPE = "table" AND NAME = "posts"'
+	c.execute(q)
+	if not c.fetchone():
+		return []
+	# Get the user_id associated with username.
+	q = 'SELECT user_id FROM user_info WHERE username = ?'
+	user_id = c.execute(q, (username,)).fetchone()
+	if not user_id:
+		[]
+	# Return the list of lists [post, heading, time]
+	q = 'SELECT post, heading, time FROM posts WHERE user_id = ?'
+	return c.execute(q, (user_id,)).fetchall()
+
+# returns the post, heading,and timestamp from the database, or []
+def get_recent_posts():
+	# If the posts table doesn't exist, return an empty list.
+	q = 'SELECT name FROM sqlite_master WHERE \
+	TYPE = "table" AND NAME = "posts"'
+	c.execute(q)
+	if not c.fetchone():
+		return []
+	# Get the last post_id in posts.
+	q = 'SELECT COUNT(*) FROM posts'
+	num_rows = c.execute(q).fetchone()[0]
+	# Return the list of lists [post, heading, time]
+	q = 'SELECT post, heading, time FROM posts WHERE post_id > ?'
+	return c.execute(q, (num_rows - 11,)).fetchall()
