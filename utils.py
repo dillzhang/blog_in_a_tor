@@ -2,7 +2,7 @@ from os import urandom
 from hashlib import sha512
 from uuid import uuid4
 from re import search
-from time import time
+from time import gmtime, strftime
 import sqlite3
 
 # a 32-byte key that should be used to secure the Flask session
@@ -160,7 +160,16 @@ def new_post(username, post, heading=None):
 	num_rows = c.execute(q).fetchone()[0]
 	q = 'INSERT INTO posts (post_id, user_id, time, heading, post) \
 	VALUES (?, ?, ?, ?, ?)'
-	c.execute(q, (num_rows + 1, user_id, time.time(), heading, post))
+	c.execute(
+		q,
+		(
+			num_rows + 1,
+			user_id,
+			strftime("%a, %d %b %Y %H:%M:%S", gmtime()),
+			heading,
+			post
+			)
+		)
 	conn.commit()
 	return num_rows + 1
 
@@ -180,7 +189,16 @@ def new_comment(username, post_id, comment):
 	num_rows = c.execute(q).fetchone()[0]
 	q = 'INSERT INTO comments (comment_id, post_id, user_id, time, comment) \
 	VALUES (?, ?, ?, ?, ?)'
-	c.execute(q, (num_rows + 1, post_id, user_id, time.time(), comment))
+	c.execute(
+		q,
+		(
+			num_rows + 1,
+			post_id,
+			user_id,
+			strftime("%a, %d %b %Y %H:%M:%S", gmtime()),
+			comment
+			)
+		)
 	conn.commit()
 	return num_rows + 1
 
@@ -227,7 +245,8 @@ def get_user_posts(username):
 	if not user_id:
 		[]
 	# Return the list of lists [post, heading, time, post_id]
-	q = 'SELECT post, heading, time, post_id FROM posts WHERE user_id = ?'
+	q = 'SELECT post, heading, time, post_id FROM posts WHERE user_id = ? \
+	ORDER BY post_id DESC'
 	info = c.execute(q, (user_id,)).fetchall()
 	conn.commit()
 	return info
@@ -244,10 +263,53 @@ def get_recent_posts():
 	q = 'SELECT COUNT(*) FROM posts'
 	num_rows = c.execute(q).fetchone()[0]
 	# Return the list of lists [post, heading, time, post_id]
-	q = 'SELECT post, heading, time, post_id FROM posts WHERE post_id > ?'
+	q = 'SELECT post, heading, time, post_id FROM posts WHERE post_id > ? \
+	ORDER BY post_id DESC'
 	info = c.execute(q, (num_rows - 11,)).fetchall()
 	conn.commit()
 	return info
+
+# modifies the post in the database, returns None
+def modify_post(post_id, new_post):
+	# If the posts table doesn't exist, return None.
+	q = 'SELECT name FROM sqlite_master WHERE \
+	TYPE = "table" AND NAME = "posts"'
+	c.execute(q)
+	if not c.fetchone():
+		return None
+	# Change the old post to the new one and return None.
+	q = 'UPDATE posts SET post = ?, time = ? WHERE post_id = ?'
+	c.execute(
+		q,
+		(
+			new_post,
+			strftime("%a, %d %b %Y %H:%M:%S", gmtime()),
+			post_id
+			)
+		)
+	conn.commit()
+	return None
+
+# modifies the comment in the database, returns None
+def modify_comment(comment_id, new_comment):
+	# If the comments table doesn't exist, return None.
+	q = 'SELECT name FROM sqlite_master WHERE \
+	TYPE = "table" AND NAME = "comments"'
+	c.execute(q)
+	if not c.fetchone():
+		return None
+	# Change the old comment to the new one and return None.
+	q = 'UPDATE comments SET comment = ?, time = ? WHERE comment_id = ?'
+	c.execute(
+		q,
+		(
+			new_comment,
+			strftime("%a, %d %b %Y %H:%M:%S", gmtime()),
+			comment_id
+			)
+		)
+	conn.commit()
+	return None
 
 # removes the post from the database, returns None
 def remove_post(post_id):
@@ -272,33 +334,5 @@ def remove_comment(comment_id):
 		return None
 	q = 'DELETE FROM comments WHERE comment_id = ?'
 	c.execute(q, (comment_id,))
-	conn.commit()
-	return None
-
-# modifies the post in the database, returns None
-def modify_post(post_id, new_post):
-	# If the posts table doesn't exist, return None.
-	q = 'SELECT name FROM sqlite_master WHERE \
-	TYPE = "table" AND NAME = "posts"'
-	c.execute(q)
-	if not c.fetchone():
-		return None
-	# Change the old post to the new one and return None.
-	q = 'UPDATE posts SET post = ? WHERE post_id = ?'
-	c.execute(q, (new_post, post_id))
-	conn.commit()
-	return None
-
-# modifies the comment in the database, returns None
-def modify_comment(comment_id, new_comment):
-	# If the comments table doesn't exist, return None.
-	q = 'SELECT name FROM sqlite_master WHERE \
-	TYPE = "table" AND NAME = "comments"'
-	c.execute(q)
-	if not c.fetchone():
-		return None
-	# Change the old comment to the new one and return None.
-	q = 'UPDATE comments SET comment = ? WHERE comment_id = ?'
-	c.execute(q, (new_comment, comment_id))
 	conn.commit()
 	return None
