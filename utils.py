@@ -161,6 +161,7 @@ def new_post(username, post, heading=None):
 	q = 'INSERT INTO posts (post_id, user_id, time, heading, post) \
 	VALUES (?, ?, ?, ?, ?)'
 	c.execute(q, (num_rows + 1, user_id, time.time(), heading, post))
+	conn.commit()
 	return num_rows + 1
 
 # enters a new comment into the database, returns comment_id or possible errors
@@ -180,11 +181,12 @@ def new_comment(username, post_id, comment):
 	q = 'INSERT INTO comments (comment_id, post_id, user_id, time, comment) \
 	VALUES (?, ?, ?, ?, ?)'
 	c.execute(q, (num_rows + 1, post_id, user_id, time.time(), comment))
+	conn.commit()
 	return num_rows + 1
 
 # returns the post, heading,and timestamp from the database, or None
 def get_post(post_id):
-	# If the posts table doesn't exist, return an error message.
+	# If the posts table doesn't exist, return None.
 	q = 'SELECT name FROM sqlite_master WHERE \
 	TYPE = "table" AND NAME = "posts"'
 	c.execute(q)
@@ -193,6 +195,7 @@ def get_post(post_id):
 	# Return the list [post, heading, time]
 	q = 'SELECT post, heading, time FROM posts WHERE post_id = ?'
 	info = c.execute(q, (post_id,)).fetchone()
+	conn.commit()
 	return info
 
 # returns the comments, usernames, times, and comment_ids from the database, or []
@@ -206,9 +209,11 @@ def get_comments(post_id):
 	# Return the list of lists [comment, username, time, comment_id].
 	q = 'SELECT comments, username, time, comment_id FROM comments, user_info \
 	WHERE comments.post_id = ?, user_info.post_id = ?'
-	return c.execute(q, (post_id, post_id)).fetchall()
+	info = c.execute(q, (post_id, post_id)).fetchall()
+	conn.commit()
+	return info
 
-# returns the post, heading,and timestamp from the database, or []
+# returns the posts, headings, times, and post_ids from the database, or []
 def get_user_posts(username):
 	# If the posts table doesn't exist, return an empty list.
 	q = 'SELECT name FROM sqlite_master WHERE \
@@ -221,11 +226,13 @@ def get_user_posts(username):
 	user_id = c.execute(q, (username,)).fetchone()
 	if not user_id:
 		[]
-	# Return the list of lists [post, heading, time]
-	q = 'SELECT post, heading, time FROM posts WHERE user_id = ?'
-	return c.execute(q, (user_id,)).fetchall()
+	# Return the list of lists [post, heading, time, post_id]
+	q = 'SELECT post, heading, time, post_id FROM posts WHERE user_id = ?'
+	info = c.execute(q, (user_id,)).fetchall()
+	conn.commit()
+	return info
 
-# returns the post, heading,and timestamp from the database, or []
+# returns the posts, headings,and times, and post_ids from the database, or []
 def get_recent_posts():
 	# If the posts table doesn't exist, return an empty list.
 	q = 'SELECT name FROM sqlite_master WHERE \
@@ -236,6 +243,62 @@ def get_recent_posts():
 	# Get the last post_id in posts.
 	q = 'SELECT COUNT(*) FROM posts'
 	num_rows = c.execute(q).fetchone()[0]
-	# Return the list of lists [post, heading, time]
-	q = 'SELECT post, heading, time FROM posts WHERE post_id > ?'
-	return c.execute(q, (num_rows - 11,)).fetchall()
+	# Return the list of lists [post, heading, time, post_id]
+	q = 'SELECT post, heading, time, post_id FROM posts WHERE post_id > ?'
+	info = c.execute(q, (num_rows - 11,)).fetchall()
+	conn.commit()
+	return info
+
+# removes the post from the database, returns None
+def remove_post(post_id):
+	# If the posts table doesn't exist, return None.
+	q = 'SELECT name FROM sqlite_master WHERE \
+	TYPE = "table" AND NAME = "posts"'
+	c.execute(q)
+	if not c.fetchone():
+		return None
+	q = 'DELETE FROM posts WHERE post_id = ?'
+	c.execute(q, (post_id,))
+	conn.commit()
+	return None
+
+# removes the comment from the database, returns None
+def remove_comment(comment_id):
+	# If the comments table doesn't exist, return None.
+	q = 'SELECT name FROM sqlite_master WHERE \
+	TYPE = "table" AND NAME = "comments"'
+	c.execute(q)
+	if not c.fetchone():
+		return None
+	q = 'DELETE FROM comments WHERE comment_id = ?'
+	c.execute(q, (comment_id,))
+	conn.commit()
+	return None
+
+# modifies the post in the database, returns None
+def modify_post(post_id, new_post):
+	# If the posts table doesn't exist, return None.
+	q = 'SELECT name FROM sqlite_master WHERE \
+	TYPE = "table" AND NAME = "posts"'
+	c.execute(q)
+	if not c.fetchone():
+		return None
+	# Change the old post to the new one and return None.
+	q = 'UPDATE posts SET post = ? WHERE post_id = ?'
+	c.execute(q, (new_post, post_id))
+	conn.commit()
+	return None
+
+# modifies the comment in the database, returns None
+def modify_comment(comment_id, new_comment):
+	# If the comments table doesn't exist, return None.
+	q = 'SELECT name FROM sqlite_master WHERE \
+	TYPE = "table" AND NAME = "comments"'
+	c.execute(q)
+	if not c.fetchone():
+		return None
+	# Change the old comment to the new one and return None.
+	q = 'UPDATE comments SET comment = ? WHERE comment_id = ?'
+	c.execute(q, (new_comment, comment_id))
+	conn.commit()
+	return None
