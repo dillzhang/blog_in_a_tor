@@ -26,6 +26,7 @@ Enters a new user with the given information into the database and returns None 
 Changes the user's hashed password in the database and returns None (or possible error messages)
 - [ ] modify_email(username, password, new_email)
 Changes the user's email in the database and returns None (or possible error messages)
+
 ### Post Functions
 - [ ] new_post(username, post, heading=None)
 Enters the new post into the database and returns the id that was generated for it (or an error message if there is no account with the given username); if no heading is provided, one is automatically generated that consists of the first 10 characters plus '...'
@@ -39,6 +40,7 @@ Returns a list of lists consisting of the 10 most recent posts, their headings, 
 Changes the post with the given id to the new post provided, updates the post's timestamp, and returns None
 - [ ] remove_post(post_id)
 Removes the post with the given id from the database and returns None
+
 ### Comment Functions
 - [ ] new_comment(username, comment, heading=None)
 Enters the new comment into the database and returns the id that was generated for it (or an error message if there is no account with the given username); if no heading is provided, one is automatically generated that consists of the first 10 characters plus '...'
