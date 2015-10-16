@@ -142,7 +142,7 @@ def modify_email(username, password, new_email):
 	return None
 
 # enters a new post into the database, returns post_id or possible errors
-def new_post(username, post, heading=post[:10]+'...'):
+def new_post(username, post, heading=None):
 	# If the posts table doesn't exist, create it.
 	q = 'CREATE TABLE IF NOT EXISTS posts \
 	(post_id INT, user_id INT, time REAL, heading TEXT, post TEXT)'
@@ -152,6 +152,9 @@ def new_post(username, post, heading=post[:10]+'...'):
 	user_id = c.execute(q, (username,)).fetchone()
 	if not user_id:
 		'Incorrect username.'
+	# If no heading was provided, set a default heading.
+	if not heading:
+		heading = post[:10]+'...'
 	# Enter the new information and return the new post's id.
 	q = 'SELECT COUNT(*) FROM posts'
 	num_rows = c.execute(q).fetchone()[0]
