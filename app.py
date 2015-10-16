@@ -7,11 +7,15 @@ app = Flask(__name__)
 @app.route("/home", methods = ["GET", "POST"])
 def home():
     if request.method == "GET":
-        return render_template("home.html")
+        uname = None
+        if "username" in session:
+            uname = session["username"]
+        return render_template("home.html",username=uname)
     elif request.form["submit"] == "login":
         username = request.form["username"]
         password = request.form["password"]
         if ( utils.check_login_info(username, password) ):
+            session["username"] = username
             return render_template("home.html") #Successful Login
         else:
             return render_template("home.html") #Failed Login
