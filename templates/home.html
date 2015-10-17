@@ -1,15 +1,14 @@
 <!DOCTYPE html>
 <html>
 
-  <!--<style>
-    .hidden{
-    display: none;
+  <style>
+    .ayylmao{
+	display: none;
     }
-  </style>-->
-
+  </style>
   <head>
 
-    <link rel="shortcut icon" href="favicon.ico" />
+    <link rel="shortcut icon" href="{{ url_for('static', filename = 'img/favicon.ico') }}">
 
     <title>Blog in a Tor</title>
 
@@ -32,6 +31,7 @@
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
 	<![endif]-->
   </head>
+
   <body>
     <div id="wrapper">
 
@@ -52,10 +52,10 @@
 	    </form>
 	  </li>
 	  {% endif %}
-
+	  <br><br>
 	  <li>
 	    <a href="#donation" class="btn btn-default" id= "donation">Donate</a>
-	    
+	    <img src="../static/img/money.gif" class="ayylmao" id="money">
 	    
 	  </li>
         </ul>
@@ -73,7 +73,6 @@
               <p>Hope everything turns out okay in the  <code>#page-content-wrapper</code>.</p>
 	      <br>
               <a href="#menu-toggle" class="btn btn-default" id="menu-toggle">Toggle Menu</a>
-	      <img src="money.gif" id="money" alt="WHYYYYY">
             </div>
           </div>
         </div>
@@ -96,23 +95,22 @@
       $("#wrapper").toggleClass("toggled");
       });
     </script>
+    
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
     <script>
       $.fn.center = function () {
       this.css("position","absolute");
-      this.css("top", Math.max(0, (($(window).height() - $(this).outerHeight()) / 2) + $(window).scrollTop()) + "px");
-      this.css("left", Math.max(0, (($(window).width() - $(this).outerWidth()) / 2) + $(window).scrollLeft()) + "px");
+      this.css("top", 400);
       return this;
       }
 
       $("#donation").on("click", function(){
-      $("#money").fadeIn().center();
+      $("#money").fadeIn().center()
       setTimeout(function(){
       $("#money").fadeOut()
-      }, 1000);
+      }, 7500);
       });
     </script>
-    
     
 
   </body>
