@@ -24,6 +24,8 @@
     <!-- Custom CSS -->
     <link href="../static/styles/css/simple-sidebar.css" rel="stylesheet"> <!-- referencing bootstrap--> 
 
+    <link rel="stylesheet" type="../static/styles/css/custom.css" rel="stylesheet">
+
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -46,15 +48,22 @@
 	    {% else %}
 	  <li>
 	    <form>
-	      <p><input type = "text" name = "username" placeholder = "Username"></p>
-	      <p><input type = "text" name = "password" placeholder = "Password"></p>
-	      <p><input type = "submit" value = "Submit"></p>
+	      <p><input type="text" name="username" placeholder="Username"></p>
+	      <p><input type="text" name="password" placeholder="Password"></p>
+	      <p><input class="btn btn-default" type="submit" value="login" name="Login"></p>
 	    </form>
 	  </li>
+	  <li>
+	    <form>
+	      <p><input type="text" name="username" placeholder="Username"></p>
+	      <p><input type="text" name="password" placeholder="Password"></p>
+	      <p><input type="text" name="confirm_password" placeholder="Confirm password"></p>
+	      <p><input type="text" name="email" placeholder="email"></p>
+	      <p><input class="btn btn-default" type="submit" value="create" name="Sign Up"></p>
 	  {% endif %}
 	  <br><br>
 	  <li>
-	    <a href="#donation" class="btn btn-default" id= "donation">Donate</a>
+	    <a href="#donation" class="btn btn-default" id= "donation">Donate for the fight against college debt</a>
 	    <img src="../static/img/money.gif" class="ayylmao" id="money">
 	    
 	  </li>
