@@ -1,3 +1,16 @@
-textarea{
-height:30px;
+.footer {width:100%; clear:both; position:fixed; bottom:30px}
+#postarea input, #postarea textarea{
+	width: 985px;
+	border: 4px solid rgba(0,0,0,0.1);
+	padding: 8px 10px;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	
+	outline: 0;
+}
+
+#comment_form textarea {
+	width: 350px;
+}
 }
