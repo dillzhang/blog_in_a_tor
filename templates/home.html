@@ -47,20 +47,20 @@
 	    <p> {{ username }} </p>
 	    {% else %}
 	  <li>
-	    <form>
+	    <form method="POST">
 	      <p><input type="text" name="username" placeholder="Username"></p>
 	      <p><input type="text" name="password" placeholder="Password"></p>
-	      <p><input class="btn btn-default" type="submit" value="login" name="Login"></p>
+	      <p><input class="btn btn-default" type="submit" value="login" name="Submit"></p>
 	    </form>
 	  </li>
 	  <br>
 	  <li>
-	    <form>
+	    <form method="POST">
 	      <p><input type="text" name="username" placeholder="Username"></p>
 	      <p><input type="text" name="password" placeholder="Password"></p>
 	      <p><input type="text" name="confirm_password" placeholder="Confirm password"></p>
 	      <p><input type="text" name="email" placeholder="email"></p>
-	      <p><input class="btn btn-default" type="submit" value="create" name="Sign Up"></p>
+	      <p><input class="btn btn-default" type="submit" value="create" name="Submit"></p>
 	  {% endif %}
 	  <br> 
 	  <li>
