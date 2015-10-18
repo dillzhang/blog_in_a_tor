@@ -10,22 +10,22 @@ def home():
         uname = None
         if "username" in session:
             uname = session["username"]
-        return render_template("home.html",username=uname)
-    elif request.form["submit"] == "login":
+        return render_template("home.html")
+    elif request.form["Submit"] == "login":
         username = request.form["username"]
         password = request.form["password"]
         if ( utils.check_login_info(username, password) ):
             session["username"] = username
-            return render_template("home.html") #Successful Login
+            return render_template("home.html",username=uname,loggedIn=True) #Successful Login
         else:
             return render_template("home.html") #Failed Login
     
-    elif request.form["submit"] == "create":
+    elif request.form["Submit"] == "create":
         username = request.form["username"]
         password = request.form["password"]
         confirm_passwd = request.form["confirm_password"]
         email = request.form["email"]
-        error = utils.register_new_user(username, password, confirm_password, email)
+        error = utils.register_new_user(username, password, confirm_passwd, email)
         if (error == None):
             return render_template("home.html") #Successful Account Creation
         else:
@@ -49,5 +49,5 @@ def user(userid=0):
 """
 if __name__ == "__main__":
        app.debug = True
-       app.secret_key = "secret_key"
+       app.secret_key = utils.secret_key
        app.run(host="0.0.0.0", port=8000)
