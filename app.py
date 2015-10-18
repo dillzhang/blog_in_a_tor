@@ -16,9 +16,9 @@ def home():
         password = request.form["password"]
         if ( utils.check_login_info(username, password) ):
             session["username"] = username
-            return render_template("home.html",username=uname,loggedIn=True) #Successful Login
+            return render_template("home.html",username=username,loggedIn=True, status="Login Successful") #Successful Login
         else:
-            return render_template("home.html") #Failed Login
+            return render_template("home.html", status="Login Failed") #Failed Login
     
     elif request.form["Submit"] == "create":
         username = request.form["username"]
@@ -27,9 +27,9 @@ def home():
         email = request.form["email"]
         error = utils.register_new_user(username, password, confirm_passwd, email)
         if (error == None):
-            return render_template("home.html") #Successful Account Creation
+            return render_template("home.html", status="Account Creation Successful") #Successful Account Creation
         else:
-            return render_template("home.html") #Failed Account Creation
+            return render_template("home.html", status="Account Creation Failed: " + error) #Failed Account Creation
 """
 @app.route("/blog/<postid>")
 def blog(postid=0):
@@ -48,6 +48,6 @@ def user(userid=0):
         #Process Form
 """
 if __name__ == "__main__":
-       app.debug = True
-       app.secret_key = utils.secret_key
-       app.run(host="0.0.0.0", port=8000)
+    app.debug = True
+    app.secret_key = utils.secret_key
+    app.run(host="0.0.0.0", port=8000)
