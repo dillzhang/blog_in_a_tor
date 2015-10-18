@@ -3,14 +3,15 @@ import utils
 
 app = Flask(__name__)
 
+
 @app.route("/", methods = ["GET", "POST"])
 @app.route("/home", methods = ["GET", "POST"])
 def home():
     if request.method == "GET":
-        uname = None
-        if "username" in session:
-            uname = session["username"]
-        return render_template("home.html")
+        if "username" in session and session["username"] != "":
+            return render_template("home.html", username=session["username"], loggedIn=True)
+        else:
+            return render_template("home.html")
     elif request.form["Submit"] == "login":
         username = request.form["username"]
         password = request.form["password"]
@@ -32,12 +33,19 @@ def home():
             return render_template("home.html", status="Account Creation Failed: " + error) #Failed Account Creation
 
         
+@app.route("/logout")
+def logout():
+    if "username" in session:
+        session["username"] = ""
+    return redirect(url_for("home"))
+
+
 @app.route("/blog/<postid>")
 def blog(postid=0):
     if postid <= 0:
         return "<h1> 404 Error </h1>"
     else:
-        return render_template("blog.html")
+        return render_template("blog.html", post=utils.get_post(postid), comments=utils.get_comments(postid))
 
     
 @app.route("/user/<username>", methods=["GET", "POST"])
@@ -47,8 +55,18 @@ def user(username=""):
     elif request.method == "GET":
         prevposts = utils.get_user_posts(username)
         return render_template("user.html", username=username, posts=prevposts)
-    elif request.method == "POST":
+    elif request.form["Submit"] == "Change Password":
+        status = utils.modify_password(username, request.form["password"], request.form["newpassowrd"], request.form["confirm_passwd"])
+        if status != None:
+            return render_template("user.html", status=status)
+    elif request.form["Submit"] == "Change Email":
+        status = utils.modify_email(username, request.form["password"], request.form["email"])
+        if status != None:
+            return render_template("user.html", status=status)
+    elif request.form["Submit"] == "Post":
+        utils.new_post(username, request.form["post"], request.form["heading"])
         return render_template("user.html")
+    return render_template("user.html")
 
     
 if __name__ == "__main__":
