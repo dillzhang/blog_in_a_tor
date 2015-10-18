@@ -8,14 +8,11 @@ import sqlite3
 # a 32-byte key that should be used to secure the Flask session
 secret_key = urandom(32);
 
-# the connection and cursor for the SQLite database containing all the data
-# for testing purposes (database only resides in RAM):
-conn = sqlite3.connect(':memory:')
-#conn = sqlite3.connect("data.db")
-c = conn.cursor()
-
 # checks whether the database contains a user with the given information
 def check_login_info(username, password):
+	# Create the connection and cursor for the SQLite database.
+	conn = sqlite3.connect("data.db")
+	c = conn.cursor()
 	# If the user_info table doesn't exist, return false.
 	q = 'SELECT name FROM sqlite_master WHERE \
 	TYPE = "table" AND NAME = "user_info"'
@@ -33,6 +30,9 @@ def check_login_info(username, password):
 
 # enters new login information into the database, returns None or possible errors
 def register_new_user(username, password, confirm_password, email):
+	# Create the connection and cursor for the SQLite database.
+	conn = sqlite3.connect("data.db")
+	c = conn.cursor()
 	# Check if the passwords match.
 	if password != confirm_password:
 		return 'Passwords do not match.'
@@ -77,6 +77,9 @@ def register_new_user(username, password, confirm_password, email):
 
 # changes the user's hashed password in the database, returns None or possible errors
 def modify_password(username, password, new_password, confirm_password):
+	# Create the connection and cursor for the SQLite database.
+	conn = sqlite3.connect("data.db")
+	c = conn.cursor()
 	# Check if the passwords match.
 	if new_password != confirm_password:
 		return 'Passwords do not match.'
@@ -115,6 +118,9 @@ def modify_password(username, password, new_password, confirm_password):
 
 # changes the user's email in the database, returns None or possible errors
 def modify_email(username, password, new_email):
+	# Create the connection and cursor for the SQLite database.
+	conn = sqlite3.connect("data.db")
+	c = conn.cursor()
 	# Check if the new email is valid.
 	if not bool(search(
 		r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@"+
@@ -143,6 +149,9 @@ def modify_email(username, password, new_email):
 
 # enters a new post into the database, returns post_id or possible errors
 def new_post(username, post, heading=None):
+	# Create the connection and cursor for the SQLite database.
+	conn = sqlite3.connect("data.db")
+	c = conn.cursor()
 	# If the posts table doesn't exist, create it.
 	q = 'CREATE TABLE IF NOT EXISTS posts \
 	(post_id INT, user_id INT, time REAL, heading TEXT, post TEXT)'
@@ -175,6 +184,9 @@ def new_post(username, post, heading=None):
 
 # enters a new comment into the database, returns comment_id or possible errors
 def new_comment(username, post_id, comment):
+	# Create the connection and cursor for the SQLite database.
+	conn = sqlite3.connect("data.db")
+	c = conn.cursor()
 	# If the comments table doesn't exist, create it.
 	q = 'CREATE TABLE IF NOT EXISTS comments \
 	(comment_id INT, post_id INT, user_id INT, time REAL, comment TEXT)'
@@ -204,6 +216,9 @@ def new_comment(username, post_id, comment):
 
 # returns the post, heading,and timestamp from the database, or None
 def get_post(post_id):
+	# Create the connection and cursor for the SQLite database.
+	conn = sqlite3.connect("data.db")
+	c = conn.cursor()
 	# If the posts table doesn't exist, return None.
 	q = 'SELECT name FROM sqlite_master WHERE \
 	TYPE = "table" AND NAME = "posts"'
@@ -218,6 +233,9 @@ def get_post(post_id):
 
 # returns the comments, usernames, times, and comment_ids from the database, or []
 def get_comments(post_id):
+	# Create the connection and cursor for the SQLite database.
+	conn = sqlite3.connect("data.db")
+	c = conn.cursor()
 	# If the comments table doesn't exist, return an empty list.
 	q = 'SELECT name FROM sqlite_master WHERE \
 	TYPE = "table" AND NAME = "comments"'
@@ -233,6 +251,9 @@ def get_comments(post_id):
 
 # returns the posts, headings, times, and post_ids from the database, or []
 def get_user_posts(username):
+	# Create the connection and cursor for the SQLite database.
+	conn = sqlite3.connect("data.db")
+	c = conn.cursor()
 	# If the posts table doesn't exist, return an empty list.
 	q = 'SELECT name FROM sqlite_master WHERE \
 	TYPE = "table" AND NAME = "posts"'
@@ -253,6 +274,9 @@ def get_user_posts(username):
 
 # returns the posts, headings,and times, and post_ids from the database, or []
 def get_recent_posts():
+	# Create the connection and cursor for the SQLite database.
+	conn = sqlite3.connect("data.db")
+	c = conn.cursor()
 	# If the posts table doesn't exist, return an empty list.
 	q = 'SELECT name FROM sqlite_master WHERE \
 	TYPE = "table" AND NAME = "posts"'
@@ -271,6 +295,9 @@ def get_recent_posts():
 
 # modifies the post in the database, returns None
 def modify_post(post_id, new_post):
+	# Create the connection and cursor for the SQLite database.
+	conn = sqlite3.connect("data.db")
+	c = conn.cursor()
 	# If the posts table doesn't exist, return None.
 	q = 'SELECT name FROM sqlite_master WHERE \
 	TYPE = "table" AND NAME = "posts"'
@@ -292,6 +319,9 @@ def modify_post(post_id, new_post):
 
 # modifies the comment in the database, returns None
 def modify_comment(comment_id, new_comment):
+	# Create the connection and cursor for the SQLite database.
+	conn = sqlite3.connect("data.db")
+	c = conn.cursor()
 	# If the comments table doesn't exist, return None.
 	q = 'SELECT name FROM sqlite_master WHERE \
 	TYPE = "table" AND NAME = "comments"'
@@ -313,6 +343,9 @@ def modify_comment(comment_id, new_comment):
 
 # removes the post from the database, returns None
 def remove_post(post_id):
+	# Create the connection and cursor for the SQLite database.
+	conn = sqlite3.connect("data.db")
+	c = conn.cursor()
 	# If the posts table doesn't exist, return None.
 	q = 'SELECT name FROM sqlite_master WHERE \
 	TYPE = "table" AND NAME = "posts"'
@@ -326,6 +359,9 @@ def remove_post(post_id):
 
 # removes the comment from the database, returns None
 def remove_comment(comment_id):
+	# Create the connection and cursor for the SQLite database.
+	conn = sqlite3.connect("data.db")
+	c = conn.cursor()
 	# If the comments table doesn't exist, return None.
 	q = 'SELECT name FROM sqlite_master WHERE \
 	TYPE = "table" AND NAME = "comments"'
