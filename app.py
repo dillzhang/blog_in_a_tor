@@ -30,23 +30,27 @@ def home():
             return render_template("home.html", status="Account Creation Successful") #Successful Account Creation
         else:
             return render_template("home.html", status="Account Creation Failed: " + error) #Failed Account Creation
-"""
+
+        
 @app.route("/blog/<postid>")
 def blog(postid=0):
     if postid <= 0:
-        #404 Error
+        return "<h1> 404 Error </h1>"
     else:
-        #Find the post and its comments
+        return render_template("blog.html")
 
-@app.route("/user/<userid>", methods = ["GET", "POST"])
-def user(userid=0):
-    if userid <= 0:
-        #404 Error
+    
+@app.route("/user/<username>", methods=["GET", "POST"])
+def user(username=""):
+    if username == "":
+        return "<h1> 404 Error </h1>"
     elif request.method == "GET":
-        #Find the user's information
+        prevposts = utils.get_user_posts(username)
+        return render_template("user.html", username=username, posts=prevposts)
     elif request.method == "POST":
-        #Process Form
-"""
+        return render_template("user.html")
+
+    
 if __name__ == "__main__":
     app.debug = True
     app.secret_key = utils.secret_key
