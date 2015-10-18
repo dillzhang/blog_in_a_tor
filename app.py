@@ -40,12 +40,41 @@ def logout():
     return redirect(url_for("home"))
 
 
-@app.route("/blog/<postid>")
+@app.route("/blog/<postid>", methods=["GET", "POST"])
 def blog(postid=0):
     if postid <= 0:
         return "<h1> 404 Error </h1>"
-    else:
+    elif request.method == "GET":
         return render_template("blog.html", post=utils.get_post(postid), comments=utils.get_comments(postid))
+    elif request.form["Submit"] == "Comment":
+        utils.new_comment(session["username"], postid, comment)
+        return redirect("/blog/" + postid)
+@app.route("/editpost/<postid>", methods=["GET", "POST"])
+def editpost(postid=-1):
+    if postid < 0:
+        return "<h1> 404 Error </h1>"
+    elif request.method == "GET":
+        return render_template("editpost.html", post=utils.get_post(postid))
+    elif request.form["Submit"] == "Update":
+        status = utils.modify_post(postid, request.form["post"])
+        return redirect("/blog/"+postid)
+    elif request.fomr["Submit"] == "Delete":
+        utils.remove_post(postid)
+        return redirect(url_for("home"))
+
+    
+@app.route("/editcomment/<commentid>", methods=["GET", "POST"])
+def editcomment(commentid=-1):
+    if commentid < 0:
+        return "<h1> 404 Error </h1>"
+    elif request.method == "GET":
+        return render_template("editcomment.html", post=utils.get_comment(commentid))
+    elif request.form["Submit"] == "Update":
+        status = utils.modify_comment(commentid, request.form["comment"])
+        return redirect(url_for("home"))
+    elif request.form["Submit"] == "Delete":
+        utils.remove_comment(commentid)
+        return redirect(url_for("home"))
 
     
 @app.route("/user/<username>", methods=["GET", "POST"])
