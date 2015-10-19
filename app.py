@@ -78,21 +78,6 @@ def edit(post_id):
 	return render_template('edit.html', post=utils.get_post(post_id))
 
 if __name__ == "__main__":
-	utils.register_new_user('Dennis Yatunin',
-		'password0',
-		'password0',
-		'dyatun@gmail.com'
-		)
-	utils.register_new_user('Mike Zamansky',
-		'abcdefg123',
-		'abcdefg123',
-		'sample@aol.com'
-		)
-	utils.register_new_user('Kerfuffle',
-		'99 bottles of beer',
-		'99 bottles of beer',
-		'wowzers@verizon.net'
-		)
-  app.debug = True
-  app.secret_key = utils.secret_key
-  app.run(host="0.0.0.0", port=8000)
+        app.debug = True
+        app.secret_key = utils.secret_key
+        app.run(host="0.0.0.0", port=8000)
