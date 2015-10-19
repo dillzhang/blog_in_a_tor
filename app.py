@@ -51,9 +51,9 @@ def blog(postid):
     elif request.method == "GET":
         return render_template("blog.html", post=utils.get_post(postid), comments=utils.get_comments(postid))
     elif request.form["Submit"] == "Comment":
-        utils.new_post(session["username"], comment)
-        return redirect("/blog/" + postid)
-)
+        postid = utils.new_post(session["username"], comment)
+        post = utils.get_post(postid)
+        return render_template("/blog/", post)
     
 @app.route("/editpost/<postid>", methods=["GET", "POST"])
 def editpost(postid=-1):

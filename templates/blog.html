@@ -96,6 +96,9 @@
       
       <!-- /#page-content-wrapper -->
       {% if loggedIn %}
+
+      <p> {{ post }} </p>
+	
       <div id="page-content-wrapper">
 	<div class="col-lg-12"> 
 	  <div class="footer"> 
@@ -107,7 +110,7 @@ placeholder="Post">
 
 		<form method = "POST">
 
-		  <p><input class="btn btn-default" type="submit" value="Comment" name="comment">
+		  <p><input class="btn btn-default" type="submit" value="Comment" name="comment"><a href="/blog/1">
 		  </p>
 		  
 		  </form>
