@@ -51,7 +51,7 @@
 	    {% if loggedIn %}
 	    
 	  <li>
-	    <p style="color:#ffffff"><a href="home.html"> Welcome {{ username }}! </a></p>
+	    <p style="color:#ffffff"> Welcome {{ username }}! </p>
 	    <form>
 	      <p style="color:#ffffff"><a href="/logout"> Logout </a></p>
 	    </form>
@@ -104,7 +104,13 @@
 		<textarea rows="5" name="comment" id="postarea"
 placeholder="Post">
 		</textarea>
-		<p><input class="btn btn-default" type="submit" value="Comment" name="comment"><a href=" </p>
+
+		<form method = "POST">
+
+		  <p><input class="btn btn-default" type="submit" value="Comment" name="comment">
+		  </p>
+		  
+		  </form>
 	      </div>
 	    </div>
 	  </div>

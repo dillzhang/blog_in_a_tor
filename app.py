@@ -35,6 +35,8 @@ def home():
 
     elif session["username"] == "":
         return render_template("home.html", loggedIn = False, logout = True)
+
+    
         
 @app.route("/logout")
 def logout():
@@ -43,7 +45,7 @@ def logout():
     return redirect(url_for("home"))
 
 @app.route("/blog/<postid>", methods=["GET", "POST"])
-def blog(postid=0):
+def blog(postid):
     if postid <= 0:
         return "<h1> 404 Error </h1>"
     elif request.method == "GET":
@@ -51,6 +53,7 @@ def blog(postid=0):
     elif request.form["Submit"] == "Comment":
         utils.new_comment(session["username"], postid, comment)
         return redirect("/blog/" + postid)
+    
 @app.route("/editpost/<postid>", methods=["GET", "POST"])
 def editpost(postid=-1):
     if postid < 0:
