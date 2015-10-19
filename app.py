@@ -11,7 +11,7 @@ def home():
         if "username" in session and session["username"] != "":
             return render_template("home.html", username=session["username"], loggedIn=True)
         else:
-            return render_template("home.html")
+            return render_template("home.html", loggedIn = False) #false for logout function
     elif request.form["Submit"] == "login":
         username = request.form["username"]
         password = request.form["password"]
