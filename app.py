@@ -33,7 +33,7 @@ def home():
         else:
             return render_template("home.html", status="Account Creation Failed: " + error) #Failed Account Creation
 
-    elif request.form["Submit"] == "logout":
+    elif session["username"] == "":
         return render_template("home.html", loggedIn = False, logout = True)
         
 @app.route("/logout")
