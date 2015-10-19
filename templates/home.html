@@ -53,7 +53,16 @@
 	  <br>
 
 	<!-- Not logged in, so create account form -->
-	  {% else %}
+	{% else %}
+
+	{% if logout %}
+	  <li>
+	    <p style="color:#E0FFFF; font-size:20px;"> Logged out </a></p>
+	  </li>
+	  <br>
+
+	  {% endif %}
+	  
 	  <p style="color:#E0FFFF; font-size:20px;"> Login </p>
 	  <li>
 	    <form method="POST">

@@ -51,9 +51,12 @@
 	    {% if loggedIn %}
 	    
 	  <li>
-	    <p style="color:#ffffff"><a href="user.html"> Welcome {{ username }}! </a></p>
+	    <p style="color:#ffffff"><a href="home.html"> Welcome {{ username }}! </a></p>
 	  </li>
-
+	  <form>
+	    <p><input class="btn btn-default" type="submit" value="logout" name="Submit"></p>
+	  </form>
+	  
 	  <li>
 	    <form method="POST">
 	      <p style="color:#E0FFFF; font-size:20px;">Change Password</p>
@@ -72,7 +75,7 @@
 	    </form>
 	  </li>
 	  <br>
-	  
+
 	  {% endif %}
 	  <br> 
         </ul>

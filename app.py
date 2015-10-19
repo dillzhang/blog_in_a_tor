@@ -11,7 +11,8 @@ def home():
         if "username" in session and session["username"] != "":
             return render_template("home.html", username=session["username"], loggedIn=True)
         else:
-            return render_template("home.html", loggedIn = False) #false for logout function
+            return render_template("home.html")
+        
     elif request.form["Submit"] == "login":
         username = request.form["username"]
         password = request.form["password"]
@@ -32,6 +33,8 @@ def home():
         else:
             return render_template("home.html", status="Account Creation Failed: " + error) #Failed Account Creation
 
+    elif request.form["Submit"] == "logout":
+        return render_template("home.html", loggedIn = False, logout = True)
         
 @app.route("/logout")
 def logout():
