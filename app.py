@@ -80,7 +80,7 @@ def edit(post_id):
 if __name__ == "__main__":
 	utils.register_new_user('Dennis Yatunin',
 		'password0',
-		'password',
+		'password0',
 		'dyatun@gmail.com'
 		)
 	utils.register_new_user('Mike Zamansky',

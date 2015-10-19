@@ -1,20 +1,21 @@
 # Blog_in_a_tor
 
 ## Collaborators
-|   **Member**   |       **Role**      |
-|:--------------:|:-------------------:|
-|Chun Hung Li    | User Experience     |
-|Dennis Yatunin  | Backend             |
-|Dillon Zhang    | Middleware          |
-|Samuel Zhang    | Leader              |
+|   **Member**   |        **Role**       |
+|:--------------:|:---------------------:|
+|Chun Hung Li    | User Experience       |
+|Dennis Yatunin  | ~~Backend~~ Everything|
+|Dillon Zhang    | Middleware            |
+|Samuel Zhang    | Leader                |
 
 ## Timetable
 
 **DUE 10/19**
 
-- [ ] Outline basic site
-- [ ] Outline database structure
-- [ ] Implement Login Server
+## Hard-coded Users
+- name: Dennis Yatunin, password: password0
+- name: Mike Zamansky, password: abcdefg123
+- name: Kerfuffle, password: 99 bottles of beer
 
 ## Backend Functions
 ### User Account Functions
