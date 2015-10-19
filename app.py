@@ -17,7 +17,7 @@ def home():
         password = request.form["password"]
         if ( utils.check_login_info(username, password) ):
             session["username"] = username
-            return render_template("home.html",username=username,loggedIn=True, status="Login Successful") #Successful Login
+            return render_template("blog.html",username=username,loggedIn=True, status="Login Successful") #Successful Login
         else:
             return render_template("home.html", status="Login Failed") #Failed Login
     

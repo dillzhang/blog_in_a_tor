@@ -46,12 +46,33 @@
         <ul class="sidebar-nav">
           <li class="sidebar-brand">
 	    <a href="#">Blog in a Tour</a>
-	    
+
+	    <!-- Will definitely be logged in -->
 	    {% if loggedIn %}
+	    
 	  <li>
 	    <p style="color:#ffffff"><a href="user.html"> Welcome {{ username }}! </a></p>
 	  </li>
-	  {% else %}
+
+	  	  <li>
+	    <form method="POST">
+	      <p style="color:#E0FFFF; font-size:20px;">Change Password</p>
+	      <p><input type="text" name="current_password" placeholder="Current Password"></p>
+	      <p><input type="text" name="reconfirm_password" placeholder="Reconfirm Password"></p>
+	      <p><input type="text" name="new_password" placeholder="New_Password"></p>
+	      <p><input class="btn btn-default" type="submit" value="change_password" name="Change Password"></p>
+	    </form>
+	  </li>
+	  <li>
+	    <form method="POST">
+	      <p style="color:#E0FFFF; font-size:20px;">Change Email</p>
+	      <p><input type="text" name="current_email" placeholder="Current Email"></p>
+	      <p><input type="text" name="new_email" placeholder="new_email"></p>
+	      <p><input class="btn btn-default" type="submit" value="change_email" name="change_email"></p>
+	    </form>
+	  </li>
+	  <br>
+	  
 	  {% endif %}
 	  <br> 
         </ul>
