@@ -44,15 +44,35 @@
 	    <a href="#">Blog in a Tour</a>
 
 	  <li>
-	    <h5>{{status}}</h5>
+	    <h5 style="color:#E0FFF; font-size:20px;">{{status}}</h5>
 	  </li>
 	    {% if loggedIn %}
 	  <li>
-	    <p style="color:#ffffff"><a href="user/{{username}}"> Welcome {{ username }}! </a></p>
+	    <p style="color:#E0FFFF; font-size:20px;"><a href="user/{{username}}"> Welcome {{ username }}! </a></p>
 	  </li>
-	    <br>
+	  <br>
 
-	    {% else %}
+	  <li>
+	    <form method="POST">
+	      <p style="color:#E0FFFF; font-size:20px;">Change Password</p>
+	      <p><input type="text" name="current_password" placeholder="Current Password"></p>
+	      <p><input type="text" name="reconfirm_password" placeholder="Reconfirm Password"></p>
+	      <p><input type="text" name="new_password" placeholder="New_Password"></p>
+	      <p><input class="btn btn-default" type="submit" value="change_password" name="Change Password"></p>
+	    </form>
+	  </li>
+	  <li>
+	    <form method="POST">
+	      <p style="color:#E0FFFF; font-size:20px;">Change Email</p>
+	      <p><input type="text" name="current_email" placeholder="Current Email"></p>
+	      <p><input type="text" name="new_email" placeholder="new_email"></p>
+	      <p><input class="btn btn-default" type="submit" value="change_email" name="change_email"></p>
+	    </form>
+	  </li>
+	  <br>
+
+	  {% else %}
+	  <p style="color:#E0FFFF; font-size:20px;"> Login </p>
 	  <li>
 	    <form method="POST">
 	      <p><input type="text" name="username" placeholder="Username"></p>
@@ -61,6 +81,7 @@
 	    </form>
 	  </li>
 	  <br>
+	  <p style="color:#E0FFFF; font-size:20px;"> Create New Account </p>
 	  <li>
 	    <form method="POST">
 	      <p><input type="text" name="username" placeholder="Username"></p>

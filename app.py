@@ -39,7 +39,6 @@ def logout():
         session["username"] = ""
     return redirect(url_for("home"))
 
-
 @app.route("/blog/<postid>", methods=["GET", "POST"])
 def blog(postid=0):
     if postid <= 0:
