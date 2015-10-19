@@ -1,0 +1,28 @@
+<h1>Home Page</h1>
+<h2>Welcome, {{session['username']}}</h2>
+<button>
+	<a style="color: inherit;text-decoration: inherit" href="/logout">
+		Logout
+	</a>
+</button>
+<h2>Recent Posts</h2>
+{% if posts %}
+	{% for post in posts %}
+		{% if post[3] in user_posts %}
+			<a href="/edit/{{post[3]}}">
+				<h3>{{post[1]}} - {{post[2]}}</h3>
+				<p>{{post[0]}}</p>
+			</a>
+		{% else %}
+			<h3>{{post[1]}} - {{post[2]}}</h3>
+			<p>{{post[0]}}</p>
+		{% endif %}
+	{% endfor %}
+{% else %}
+<h3>No recent posts.</h3>
+{% endif %}
+<form method="post">
+	<p>New Post: <input type="text" name="post"></p>
+	<p>Post Title (optional): <input type="text" name="heading"></p>
+	<p><input type="submit" value="Submit"></p>
+</form>

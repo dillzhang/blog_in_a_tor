@@ -1,0 +1,16 @@
+<h1>Create New Account</h1>
+<p>
+	Please enter your new credentials.
+	Your password must be at least 8 characters long
+	and contain both letters and digits.
+</p>
+{% if error %}
+<p style="color:red">{{error}}
+{% endif %}
+<form method="post">
+	<p>Username: <input type="text" name="username"></p>
+	<p>Password: <input type="password" name="password"></p>
+	<p>Confirm Password: <input type="password" name="confirm_password"></p>
+	<p>Email: <input type="text" name="email"></p>
+	<p><input type="submit" value="Submit"></p>
+</form>

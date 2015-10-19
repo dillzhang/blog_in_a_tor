@@ -1,0 +1,16 @@
+<h1>Edit Post</h1>
+<h2>Welcome, {{session['username']}}</h2>
+<button>
+	<a style="color: inherit;text-decoration: inherit" href="/logout">
+		Logout
+	</a>
+</button>
+<h3>{{post[1]}} - {{post[2]}}</h3>
+<p>{{post[0]}}</p>
+<form method="post">
+	<p>New Post: <input type="text" name="new_post"></p>
+	<p><input type="submit" name="modify" value="Submit"></p>
+</form>
+<form method="post">
+	<p><input type="submit" name="delete" value="Delete"></p>
+</form>

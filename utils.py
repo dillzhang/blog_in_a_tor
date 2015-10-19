@@ -41,6 +41,9 @@ def register_new_user(username, password, confirm_password, email):
 	# Check if the passwords match.
 	if password != confirm_password:
 		return 'Passwords do not match.'
+	# Check if the username is valid.
+	if len(username) < 1:
+		return 'Username must be at least 1 character long.'
 	# Check if the password is valid.
 	if len(password) < 8:
 		return 'Password must be at least 8 characters long.'
@@ -153,21 +156,21 @@ def modify_email(username, password, new_email):
 	return None
 
 # enters a new post into the database, returns post_id or possible errors
-def new_post(username, post, heading=None):
+def new_post(username, post, heading=''):
 	# Create the connection and cursor for the SQLite database.
 	conn = sqlite3.connect("data.db")
 	c = conn.cursor()
 	# If the posts table doesn't exist, create it.
 	q = 'CREATE TABLE IF NOT EXISTS posts \
-	(post_id INT, user_id INT, time REAL, heading TEXT, post TEXT)'
+	(post_id INT, user_id INT, time TEXT, heading TEXT, post TEXT)'
 	c.execute(q)
 	# Get the user_id associated with username.
 	q = 'SELECT user_id FROM user_info WHERE username = ?'
-	user_id = c.execute(q, (username,)).fetchone()
+	user_id = c.execute(q, (username,)).fetchone()[0]
 	if not user_id:
-		'Incorrect username.'
+		return 'Incorrect username.'
 	# If no heading was provided, set a default heading.
-	if not heading:
+	if heading == '':
 		heading = post[:10]+'...'
 	# Enter the new information and return the new post's id.
 	q = 'SELECT COUNT(*) FROM posts'
@@ -194,11 +197,11 @@ def new_comment(username, post_id, comment):
 	c = conn.cursor()
 	# If the comments table doesn't exist, create it.
 	q = 'CREATE TABLE IF NOT EXISTS comments \
-	(comment_id INT, post_id INT, user_id INT, time REAL, comment TEXT)'
+	(comment_id INT, post_id INT, user_id INT, time TEXT, comment TEXT)'
 	c.execute(q)
 	# Get the user_id associated with username.
 	q = 'SELECT user_id FROM user_info WHERE username = ?'
-	user_id = c.execute(q, (username,)).fetchone()
+	user_id = c.execute(q, (username,)).fetchone()[0]
 	if not user_id:
 		'Incorrect username.'
 	# Enter the new information and return the new comment's id.
@@ -254,7 +257,7 @@ def get_comments(post_id):
 	conn.commit()
 	return info
 
-# returns the posts, headings, times, and post_ids from the database, or []
+# returns the post_ids from the database, or []
 def get_user_posts(username):
 	# Create the connection and cursor for the SQLite database.
 	conn = sqlite3.connect("data.db")
@@ -267,13 +270,10 @@ def get_user_posts(username):
 		return []
 	# Get the user_id associated with username.
 	q = 'SELECT user_id FROM user_info WHERE username = ?'
-	user_id = c.execute(q, (username,)).fetchone()
-	if not user_id:
-		[]
+	user_id = c.execute(q, (username,)).fetchone()[0]
 	# Return the list of lists [post, heading, time, post_id]
-	q = 'SELECT post, heading, time, post_id FROM posts WHERE user_id = ? \
-	ORDER BY post_id DESC'
-	info = c.execute(q, (user_id,)).fetchall()
+	q = 'SELECT post_id FROM posts WHERE user_id = ?'
+	info = [row[0] for row in c.execute(q, (user_id,)).fetchall()]
 	conn.commit()
 	return info
 

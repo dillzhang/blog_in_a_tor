@@ -1,0 +1,23 @@
+<h1>Home Page</h1>
+<p>Please login to edit or add new posts.</p>
+{% if error %}
+<p style="color:red">{{error}}
+{% endif %}
+<form method="post">
+	<p>Username: <input type="text" name="username"></p>
+	<p>Password: <input type="password" name="password"></p>
+	<p><input type="submit" value="Submit"></p>
+</form>
+<p>
+	If this is your first time here, please click
+	<a href="/register">here</a> to register.
+</p>
+<h2>Recent Posts</h2>
+{% if posts %}
+	{% for post in posts %}
+		<h3>{{post[1]}} - {{post[2]}}</h3>
+		<p>{{post[0]}}</p>
+	{% endfor %}
+{% else %}
+<h3>No recent posts.</h3>
+{% endif %}

@@ -1,110 +1,98 @@
-from flask import Flask, render_template, request, session, redirect, url_for
+from flask import Flask, render_template, session, request, redirect, url_for
 import utils
 
 app = Flask(__name__)
 
+@app.route('/', methods=['GET', 'POST'])
+@app.route('/index', methods=['GET', 'POST'])
+@app.route('/home', methods=['GET', 'POST'])
+def index():
+	if request.method == 'POST':
+		if 'username' not in session:
+			return redirect(url_for('login'))
+		utils.new_post(
+			session['username'],
+			request.form['post'],
+			request.form['heading']
+			)
+		return render_template(
+			'index.html',
+			posts=utils.get_recent_posts(),
+			user_posts=utils.get_user_posts(session['username'])
+			)
+	if 'username' in session:
+		return render_template(
+			'index.html',
+			posts=utils.get_recent_posts(),
+			user_posts=utils.get_user_posts(session['username'])
+			)
+	return redirect(url_for('login'))
 
-@app.route("/", methods = ["GET", "POST"])
-@app.route("/home", methods = ["GET", "POST"])
-def home():
-    if request.method == "GET":
-        if "username" in session and session["username"] != "":
-            return render_template("home.html", username=session["username"], loggedIn=True)
-        else:
-            return render_template("home.html")
-        
-    elif request.form["Submit"] == "login":
-        username = request.form["username"]
-        password = request.form["password"]
-        if ( utils.check_login_info(username, password) ):
-            session["username"] = username
-            return render_template("blog.html",username=username,loggedIn=True, status="Login Successful") #Successful Login
-        else:
-            return render_template("home.html", status="Login Failed") #Failed Login
-    
-    elif request.form["Submit"] == "create":
-        username = request.form["username"]
-        password = request.form["password"]
-        confirm_passwd = request.form["confirm_password"]
-        email = request.form["email"]
-        error = utils.register_new_user(username, password, confirm_passwd, email)
-        if (error == None):
-            return render_template("home.html", status="Account Creation Successful") #Successful Account Creation
-        else:
-            return render_template("home.html", status="Account Creation Failed: " + error) #Failed Account Creation
-
-    elif session["username"] == "":
-        return render_template("home.html", loggedIn = False, logout = True)
-
-    
-        
-@app.route("/logout")
+@app.route('/logout')
 def logout():
-    if "username" in session:
-        session["username"] = ""
-    return redirect(url_for("home"))
+	if 'username' in session:
+			del session['username']
+	return redirect(url_for('login'))
 
-@app.route("/blog/<postid>", methods=["GET", "POST"])
-def blog(postid):
-    if postid <= 0:
-        return "<h1> 404 Error </h1>"
-    elif request.method == "GET":
-        return render_template("blog.html", post=utils.get_post(postid), comments=utils.get_comments(postid))
-    elif request.form["Submit"] == "Comment":
-        postid = utils.new_post(session["username"], comment)
-        post = utils.get_post(postid)
-        return render_template("/blog/", post)
-    
-@app.route("/editpost/<postid>", methods=["GET", "POST"])
-def editpost(postid=-1):
-    if postid < 0:
-        return "<h1> 404 Error </h1>"
-    elif request.method == "GET":
-        return render_template("editpost.html", post=utils.get_post(postid))
-    elif request.form["Submit"] == "Update":
-        status = utils.modify_post(postid, request.form["post"])
-        return redirect("/blog/"+postid)
-    elif request.fomr["Submit"] == "Delete":
-        utils.remove_post(postid)
-        return redirect(url_for("home"))
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+	if request.method == 'POST':
+		username = request.form['username']
+		if utils.check_login_info(username, request.form['password']):
+			session['username'] = username
+			return redirect(url_for('index'))
+		else:
+			return render_template('login.html',
+				error='Invalid username or password.', posts=utils.get_recent_posts())
+	return render_template('login.html', posts=utils.get_recent_posts())
 
-    
-@app.route("/editcomment/<commentid>", methods=["GET", "POST"])
-def editcomment(commentid=-1):
-    if commentid < 0:
-        return "<h1> 404 Error </h1>"
-    elif request.method == "GET":
-        return render_template("editcomment.html", post=utils.get_comment(commentid))
-    elif request.form["Submit"] == "Update":
-        status = utils.modify_comment(commentid, request.form["comment"])
-        return redirect(url_for("home"))
-    elif request.form["Submit"] == "Delete":
-        utils.remove_comment(commentid)
-        return redirect(url_for("home"))
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+	if request.method == 'POST':
+		username = request.form['username']
+		error = utils.register_new_user(
+			username,
+			request.form['password'],
+			request.form['confirm_password'],
+			request.form['email']
+			)
+		if error:
+			return render_template('register.html', error=error)
+		else:
+			session['username'] = username
+			return redirect(url_for('index'))
+	return render_template('register.html')
 
-    
-@app.route("/user/<username>", methods=["GET", "POST"])
-def user(username=""):
-    if username == "":
-        return "<h1> 404 Error </h1>"
-    elif request.method == "GET":
-        prevposts = utils.get_user_posts(username)
-        return render_template("user.html", username=username, posts=prevposts)
-    elif request.form["Submit"] == "Change Password":
-        status = utils.modify_password(username, request.form["password"], request.form["newpassowrd"], request.form["confirm_passwd"])
-        if status != None:
-            return render_template("user.html", status=status)
-    elif request.form["Submit"] == "Change Email":
-        status = utils.modify_email(username, request.form["password"], request.form["email"])
-        if status != None:
-            return render_template("user.html", status=status)
-    elif request.form["Submit"] == "Post":
-        utils.new_post(username, request.form["post"], request.form["heading"])
-        return render_template("user.html")
-    return render_template("user.html")
+@app.route('/edit/<int:post_id>', methods=['GET', 'POST'])
+def edit(post_id):
+	if request.method == 'POST':
+		if 'modify' in request.form:
+			utils.modify_post(post_id, request.form['new_post'])
+		else:
+			utils.remove_post(post_id)
+		return redirect(url_for('index'))
+	if 'username' not in session:
+		return redirect(url_for('login'))
+	if post_id not in utils.get_user_posts(session['username']):
+		return 'Error: Invalid post id.'
+	return render_template('edit.html', post=utils.get_post(post_id))
 
-    
 if __name__ == "__main__":
-    app.debug = True
-    app.secret_key = utils.secret_key
-    app.run(host="0.0.0.0", port=8000)
+	utils.register_new_user('Dennis Yatunin',
+		'password0',
+		'password',
+		'dyatun@gmail.com'
+		)
+	utils.register_new_user('Mike Zamansky',
+		'abcdefg123',
+		'abcdefg123',
+		'sample@aol.com'
+		)
+	utils.register_new_user('Kerfuffle',
+		'99 bottles of beer',
+		'99 bottles of beer',
+		'wowzers@verizon.net'
+		)
+  app.debug = True
+  app.secret_key = utils.secret_key
+  app.run(host="0.0.0.0", port=8000)
