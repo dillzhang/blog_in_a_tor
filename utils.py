@@ -22,11 +22,16 @@ def check_login_info(username, password):
 	# If the table does exist, check the given username and password.
 	q = 'SELECT salt, hash_value FROM user_info WHERE username = ?'
 	salt_n_hash = c.execute(q, (username,)).fetchone()
+	# If the username does not exist, return false.
+	if not salt_n_hash:
+		return False
+	# If the password is wrong, return false.
 	if (
-		sha512((password + salt_n_hash[0]) * 10000).hexdigest() == salt_n_hash[1]
+		sha512((password + salt_n_hash[0]) * 10000).hexdigest() != salt_n_hash[1]
 		):
-		return True
-	return False
+		return False
+	# Finally, return true.
+	return True
 
 # enters new login information into the database, returns None or possible errors
 def register_new_user(username, password, confirm_password, email):
