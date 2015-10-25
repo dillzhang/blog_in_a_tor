@@ -3,31 +3,34 @@ from hashlib import sha512
 from uuid import uuid4
 from re import search
 from time import gmtime, strftime
-import sqlite3
-
+from pymongo import MongoClient
+#import sqlite3
+'''
+	Things Finished And Tested:
+	Things Finished But not Tested: Check_Login_Info, modify_password, modify_email
+	Things Partially Finished: register_new_user (Find way to check all users and emails easily)
+	Things to Finish: Everything Else, Delete Extra Comments when finished
+'''
 # a 32-byte key that should be used to secure the Flask session
 secret_key = urandom(32);
 
 # checks whether the database contains a user with the given information
 def check_login_info(username, password):
-	# Create the connection and cursor for the SQLite database.
-	conn = sqlite3.connect("data.db")
-	c = conn.cursor()
+	#Creates Connection to MongoClient and Connects to the database
+	connection = MongoClient()
+	c = connection['data']
 	# If the user_info table doesn't exist, return false.
-	q = 'SELECT name FROM sqlite_master WHERE \
-	TYPE = "table" AND NAME = "user_info"'
-	c.execute(q)
-	if not c.fetchone():
-		return False
+	if not "user_info" in c.collection_names():
+			return false
 	# If the table does exist, check the given username and password.
-	q = 'SELECT salt, hash_value FROM user_info WHERE username = ?'
-	salt_n_hash = c.execute(q, (username,)).fetchone()
+	#q = 'SELECT salt, hash_value FROM user_info WHERE username = ?'
+	salt_n_hash = c.user_info.find({'username':username})
 	# If the username does not exist, return false.
 	if not salt_n_hash:
 		return False
 	# If the password is wrong, return false.
 	if (
-		sha512((password + salt_n_hash[0]) * 10000).hexdigest() != salt_n_hash[1]
+		sha512((password + salt_n_hash['salt']) * 10000).hexdigest() != salt_n_hash['hash_value']
 		):
 		return False
 	# Finally, return true.
@@ -36,8 +39,8 @@ def check_login_info(username, password):
 # enters new login information into the database, returns None or possible errors
 def register_new_user(username, password, confirm_password, email):
 	# Create the connection and cursor for the SQLite database.
-	conn = sqlite3.connect("data.db")
-	c = conn.cursor()
+	connection = MongoClient()
+	c = connection['data']
 	# Check if the passwords match.
 	if password != confirm_password:
 		return 'Passwords do not match.'
@@ -59,12 +62,12 @@ def register_new_user(username, password, confirm_password, email):
 		r"|gov|mil|biz|info|mobi|name|aero|asia|jobs|museum)\b", email)):
 		return 'Email is invalid.'
 	# If the user_info table doesn't exist, create it.
-	q = 'CREATE TABLE IF NOT EXISTS user_info \
-	(user_id INT, username TEXT, salt INT, hash_value INT, email TEXT)'
-	c.execute(q)
+	#q = 'CREATE TABLE IF NOT EXISTS user_info \
+	#(user_id INT, username TEXT, salt INT, hash_value INT, email TEXT)'
+	#c.execute(q)
 	# Check if the username or email is taken.
-	q = 'SELECT username, email FROM user_info'
-	users = c.execute(q).fetchall()
+	#q = 'SELECT username, email FROM user_info'
+	#users = c.user_info.find({'username'})
 	if username in [user[0] for user in users]:
 		return 'Username already taken.'
 	if email in [user[1] for user in users]:
@@ -75,19 +78,23 @@ def register_new_user(username, password, confirm_password, email):
 	# for added security.
 	hash_value = sha512((password + salt) * 10000).hexdigest()
 	# Enter the new information and return None.
-	q = 'SELECT COUNT(*) FROM user_info'
-	num_rows = c.execute(q).fetchone()[0]
-	q = 'INSERT INTO user_info (user_id, username, salt, hash_value, email) \
-	VALUES (?, ?, ?, ?, ?)'
-	c.execute(q, (num_rows + 1, username, salt, hash_value, email))
-	conn.commit()
+	#q = 'SELECT COUNT(*) FROM user_info'
+	num_rows = c.user_info.count()
+	#q = 'INSERT INTO user_info (user_id, username, salt, hash_value, email) \
+	#VALUES (?, ?, ?, ?, ?)'
+	d = {'user_id':num_rows + 1,
+		'username':username,
+		'salt':salt,
+		'hash_value':hash_value,
+		'email':email}
+	c.user_info.insert(d)
 	return None
 
 # changes the user's hashed password in the database, returns None or possible errors
 def modify_password(username, password, new_password, confirm_password):
 	# Create the connection and cursor for the SQLite database.
-	conn = sqlite3.connect("data.db")
-	c = conn.cursor()
+	connection = MongoClient()
+	c = connection['data']
 	# Check if the passwords match.
 	if new_password != confirm_password:
 		return 'Passwords do not match.'
@@ -100,17 +107,14 @@ def modify_password(username, password, new_password, confirm_password):
 		):
 		return 'Password must contain both letters and digits.'
 	# If the user_info table doesn't exist, return an error message.
-	q = 'SELECT name FROM sqlite_master WHERE \
-	TYPE = "table" AND NAME = "user_info"'
-	c.execute(q)
-	if not c.fetchone():
+	if not "user_info" in c.collection_names():
 		return 'Incorrect username or password.'
 	# If the table does exist, check the old username and password.
-	q = 'SELECT salt, hash_value FROM user_info WHERE username = ?'
-	salt_n_hash = c.execute(q, (username,)).fetchone()
+	#q = 'SELECT salt, hash_value FROM user_info WHERE username = ?'
+	salt_n_hash = c.user_info.find({'username':username})
 	if not (
 		bool(salt_n_hash) and
-		sha512((password + salt_n_hash[0]) * 10000).hexdigest() == salt_n_hash[1]
+		sha512((password + salt_n_hash['salt']) * 10000).hexdigest() == salt_n_hash['hash_value']
 		):
 		return 'Incorrect username or password.'
 	# Create a random salt to add to the hash.
@@ -119,16 +123,16 @@ def modify_password(username, password, new_password, confirm_password):
 	# for added security.
 	hash_value = sha512((new_password + salt) * 10000).hexdigest()
 	# Change the old salt and hash_value to the new ones and return None.
-	q = 'UPDATE user_info SET salt = ?, hash_value = ? WHERE username = ?'
-	c.execute(q, (salt, hash_value, username))
-	conn.commit()
+	#q = 'UPDATE user_info SET salt = ?, hash_value = ? WHERE username = ?'
+	c.user_info.update({'username':username}, {"$set":{'salt':salt},{'hash_value':hash_value}})
+	#conn.commit()
 	return None
 
 # changes the user's email in the database, returns None or possible errors
 def modify_email(username, password, new_email):
 	# Create the connection and cursor for the SQLite database.
-	conn = sqlite3.connect("data.db")
-	c = conn.cursor()
+	connection = MongoClient()
+	c = connection['data']
 	# Check if the new email is valid.
 	if not bool(search(
 		r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@"+
@@ -136,22 +140,21 @@ def modify_email(username, password, new_email):
 		r"|gov|mil|biz|info|mobi|name|aero|asia|jobs|museum)\b", new_email)):
 		return 'Email is invalid.'
 	# If the user_info table doesn't exist, return an error message.
-	q = 'SELECT name FROM sqlite_master WHERE \
-	TYPE = "table" AND NAME = "user_info"'
-	c.execute(q)
-	if not c.fetchone():
+	#q = 'SELECT name FROM sqlite_master WHERE \
+	#TYPE = "table" AND NAME = "user_info"'
+	if not "user_info" in c.collection_names():
 		return 'Incorrect username or password.'
 	# If the table does exist, check the username and password.
-	q = 'SELECT salt, hash_value FROM user_info WHERE username = ?'
-	salt_n_hash = c.execute(q, (username,)).fetchone()
+	#q = 'SELECT salt, hash_value FROM user_info WHERE username = ?'
+	salt_n_hash = c.user_info.find({'username':username})
 	if not (
 		bool(salt_n_hash) and
-		sha512((password + salt_n_hash[0]) * 10000).hexdigest() == salt_n_hash[1]
+		sha512((password + salt_n_hash['salt']) * 10000).hexdigest() == salt_n_hash['hash_value']
 		):
 		return 'Incorrect username or password.'
 	# Change the old email to the new one and return None.
-	q = 'UPDATE user_info SET email = ? WHERE username = ?'
-	c.execute(q, (new_email, username))
+	#q = 'UPDATE user_info SET email = ? WHERE username = ?'
+	c.user_info.update({'username':username}, {"$set":{'email':new_email}})
 	conn.commit()
 	return None
 
