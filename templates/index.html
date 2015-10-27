@@ -1,3 +1,7 @@
+{% extends "master.html" %}
+{% block title %}Home{% endblock %}
+
+{% block body %}
 <h1>Home Page</h1>
 <h2>Welcome, {{session['username']}}</h2>
 <button>
@@ -26,3 +30,4 @@
 	<p>Post Title (optional): <input type="text" name="heading"></p>
 	<p><input type="submit" value="Submit"></p>
 </form>
+{% endblock %}
