@@ -4,7 +4,7 @@ from uuid import uuid4
 from re import search
 from time import gmtime, strftime
 from pymongo import MongoClient
-#import sqlite3
+import sqlite3
 '''
 	Things Finished And Tested:
 	Things Finished But not Tested: Check_Login_Info, modify_password, modify_email
@@ -24,7 +24,7 @@ def check_login_info(username, password):
 			return false
 	# If the table does exist, check the given username and password.
 	#q = 'SELECT salt, hash_value FROM user_info WHERE username = ?'
-	salt_n_hash = c.user_info.find({'username':username})
+	salt_n_hash = c.user_info.find_one({'username':username})
 	# If the username does not exist, return false.
 	if not salt_n_hash:
 		return False
@@ -68,10 +68,10 @@ def register_new_user(username, password, confirm_password, email):
 	# Check if the username or email is taken.
 	#q = 'SELECT username, email FROM user_info'
 	#users = c.user_info.find({'username'})
-	if username in [user[0] for user in users]:
-		return 'Username already taken.'
-	if email in [user[1] for user in users]:
-		return 'Email already taken.'
+	if c.user_info.find_one({'username':username}) != None :
+		return 'Username already taken'
+	if c.user_info.find({'email':email}) != None:
+		return 'Email already taken'
 	# Create a random salt to add to the hash.
 	salt = uuid4().hex
 	# Create a hash, and use string concatenation to make the hash function slow
@@ -111,7 +111,7 @@ def modify_password(username, password, new_password, confirm_password):
 		return 'Incorrect username or password.'
 	# If the table does exist, check the old username and password.
 	#q = 'SELECT salt, hash_value FROM user_info WHERE username = ?'
-	salt_n_hash = c.user_info.find({'username':username})
+	salt_n_hash = c.user_info.find_one({'username':username})
 	if not (
 		bool(salt_n_hash) and
 		sha512((password + salt_n_hash['salt']) * 10000).hexdigest() == salt_n_hash['hash_value']
@@ -124,7 +124,7 @@ def modify_password(username, password, new_password, confirm_password):
 	hash_value = sha512((new_password + salt) * 10000).hexdigest()
 	# Change the old salt and hash_value to the new ones and return None.
 	#q = 'UPDATE user_info SET salt = ?, hash_value = ? WHERE username = ?'
-	c.user_info.update({'username':username}, {"$set":{'salt':salt},{'hash_value':hash_value}})
+	c.user_info.update({'username':username}, {"$set":{'salt':salt,'hash_value':hash_value}})
 	#conn.commit()
 	return None
 
@@ -146,7 +146,7 @@ def modify_email(username, password, new_email):
 		return 'Incorrect username or password.'
 	# If the table does exist, check the username and password.
 	#q = 'SELECT salt, hash_value FROM user_info WHERE username = ?'
-	salt_n_hash = c.user_info.find({'username':username})
+	salt_n_hash = c.user_info.find_one({'username':username})
 	if not (
 		bool(salt_n_hash) and
 		sha512((password + salt_n_hash['salt']) * 10000).hexdigest() == salt_n_hash['hash_value']
@@ -155,7 +155,7 @@ def modify_email(username, password, new_email):
 	# Change the old email to the new one and return None.
 	#q = 'UPDATE user_info SET email = ? WHERE username = ?'
 	c.user_info.update({'username':username}, {"$set":{'email':new_email}})
-	conn.commit()
+	#conn.commit()
 	return None
 
 # enters a new post into the database, returns post_id or possible errors
