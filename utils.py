@@ -4,7 +4,7 @@ from uuid import uuid4
 from re import search
 from time import gmtime, strftime
 from pymongo import MongoClient
-#import sqlite3
+import sqlite3
 '''
 	Things Finished And Tested:
 	Things Finished But not Tested: Check_Login_Info, modify_password, modify_email
@@ -19,9 +19,10 @@ def check_login_info(username, password):
 	#Creates Connection to MongoClient and Connects to the database
 	connection = MongoClient()
 	c = connection['data']
+	print c.collection_names()
 	# If the user_info table doesn't exist, return false.
 	if not "user_info" in c.collection_names():
-			return false
+			return False
 	# If the table does exist, check the given username and password.
 	#q = 'SELECT salt, hash_value FROM user_info WHERE username = ?'
 	salt_n_hash = c.user_info.find({'username':username})
@@ -67,10 +68,9 @@ def register_new_user(username, password, confirm_password, email):
 	#c.execute(q)
 	# Check if the username or email is taken.
 	#q = 'SELECT username, email FROM user_info'
-	#users = c.user_info.find({'username'})
-	if username in [user[0] for user in users]:
+	if c.user_info.find({'username':username}) != None:
 		return 'Username already taken.'
-	if email in [user[1] for user in users]:
+	if c.user_info.find({'email':email}) != None:
 		return 'Email already taken.'
 	# Create a random salt to add to the hash.
 	salt = uuid4().hex
@@ -124,7 +124,7 @@ def modify_password(username, password, new_password, confirm_password):
 	hash_value = sha512((new_password + salt) * 10000).hexdigest()
 	# Change the old salt and hash_value to the new ones and return None.
 	#q = 'UPDATE user_info SET salt = ?, hash_value = ? WHERE username = ?'
-	c.user_info.update({'username':username}, {"$set":{'salt':salt},{'hash_value':hash_value}})
+	c.user_info.update({'username':username}, {"$set":{'salt':salt,'hash_value':hash_value}})
 	#conn.commit()
 	return None
 
@@ -380,3 +380,4 @@ def remove_comment(comment_id):
 	c.execute(q, (comment_id,))
 	conn.commit()
 	return None
+
