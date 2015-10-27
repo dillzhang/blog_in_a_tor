@@ -194,7 +194,7 @@ def new_post(username, post, heading=''):
 	#	)
 	q = {'post_id':num_rows + 1,
 		'user_id':user_id,
-		'time':strftime("%a, %d %b %Y %H:%M:%S", gmtime()),
+		'time':strftime("%a, %d %b %Y %H:%M:%S", gmtime())
 		'heading':heading,
 		'post':post}
 	c.posts.insert(q)
