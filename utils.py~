@@ -163,42 +163,36 @@ def modify_email(username, password, new_email):
 # enters a new post into the database, returns post_id or possible errors
 def new_post(username, post, heading=''):
 	# Create the connection and cursor for the SQLite database.
-	connection = MongoClient()
-	c = connection['data.db']
+	conn = sqlite3.connect("data.db")
+	c = conn.cursor()
 	# If the posts table doesn't exist, create it.
-	#q = 'CREATE TABLE IF NOT EXISTS posts \
-	#(post_id INT, user_id INT, time TEXT, heading TEXT, post TEXT)'
-	#c.execute(q)
+	q = 'CREATE TABLE IF NOT EXISTS posts \
+	(post_id INT, user_id INT, time TEXT, heading TEXT, post TEXT)'
+	c.execute(q)
 	# Get the user_id associated with username.
-	#q = 'SELECT user_id FROM user_info WHERE username = ?'	
-	user_id = c.user_info.find_one({'username':username})['user_id']
+	q = 'SELECT user_id FROM user_info WHERE username = ?'
+	user_id = c.execute(q, (username,)).fetchone()[0]
 	if not user_id:
 		return 'Incorrect username.'
 	# If no heading was provided, set a default heading.
 	if heading == '':
 		heading = post[:10]+'...'
 	# Enter the new information and return the new post's id.
-	#q = 'SELECT COUNT(*) FROM posts'
-	num_rows = c.posts.count()
-	#q = 'INSERT INTO posts (post_id, user_id, time, heading, post) \
-	#VALUES (?, ?, ?, ?, ?)'
-	#c.execute(
-	#	q,
-	#	(
-	#		num_rows + 1,
-	#		user_id,
-	#		strftime("%a, %d %b %Y %H:%M:%S", gmtime()),
-	#		heading,
-	#		post
-	#		)
-	#	)
-	q = {'post_id':num_rows + 1,
-		'user_id':user_id,
-		'time':strftime("%a, %d %b %Y %H:%M:%S", gmtime())
-		'heading':heading,
-		'post':post}
-	c.posts.insert(q)
-	#conn.commit()
+	q = 'SELECT COUNT(*) FROM posts'
+	num_rows = c.execute(q).fetchone()[0]
+	q = 'INSERT INTO posts (post_id, user_id, time, heading, post) \
+	VALUES (?, ?, ?, ?, ?)'
+	c.execute(
+		q,
+		(
+			num_rows + 1,
+			user_id,
+			strftime("%a, %d %b %Y %H:%M:%S", gmtime()),
+			heading,
+			post
+			)
+		)
+	conn.commit()
 	return num_rows + 1
 
 # enters a new comment into the database, returns comment_id or possible errors
