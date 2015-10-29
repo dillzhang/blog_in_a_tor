@@ -7,7 +7,10 @@
 |Dennis Yatunin  | ~~Backend~~ Everything|
 |Dillon Zhang    | Middleware            |
 |Samuel Zhang    | Leader                |
-| **Group Two**				 |
+
+
+## Group Two
+| **Member**	 | 	**Role** 	 |
 |:--------------:|:---------------------:|
 |Leon Chou       | Leader                |
 |Sean Chu        | Backend               |
