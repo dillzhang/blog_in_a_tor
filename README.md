@@ -7,6 +7,10 @@
 |Dennis Yatunin  | ~~Backend~~ Everything|
 |Dillon Zhang    | Middleware            |
 |Samuel Zhang    | Leader                |
+|:--------------:|:---------------------:|
+|Leon Chou       | Leader                |
+|Sean Chu        | Backend               |
+|Max Fishelson   | UX                    |
 
 ## Timetable
 
