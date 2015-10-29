@@ -8,6 +8,14 @@
 |Dillon Zhang    | Middleware            |
 |Samuel Zhang    | Leader                |
 
+
+## Group Two
+| **Member**	 | 	**Role** 	 |
+|:--------------:|:---------------------:|
+|Leon Chou       | Leader                |
+|Sean Chu        | Backend               |
+|Max Fishelson   | UX                    |
+
 ## Timetable
 
 **DUE 10/19**
