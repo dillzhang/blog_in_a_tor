@@ -1,4 +1,7 @@
-<h1>Home Page</h1>
+{% extends "master.html" %}
+{% block title %}Login{% endblock %}
+
+{% block body %}
 <p>Please login to edit or add new posts.</p>
 {% if error %}
 <p style="color:red">{{error}}
@@ -21,3 +24,4 @@
 {% else %}
 <h3>No recent posts.</h3>
 {% endif %}
+{% endblock %}

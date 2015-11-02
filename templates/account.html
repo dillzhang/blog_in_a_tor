@@ -1,0 +1,17 @@
+{% extends "master.html" %}
+{% block title %}Account Settings{% endblock %}
+{% block body %}
+
+
+<form method="POST">
+New Username:<input type="text" name="username"><br>
+New Password:<input type="password" name="newpwd">
+Confirm Password:<input type="password" name="cnfpwd">
+Change Email:<input type="text" name="email">
+<input type="submit" value="Submit">
+</form>
+
+
+
+
+{% endblock %}

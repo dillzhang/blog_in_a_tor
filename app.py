@@ -63,6 +63,10 @@ def register():
 			return redirect(url_for('index'))
 	return render_template('register.html')
 
+@app.route('/account', methods=['GET','POST'])
+def account():
+	return render_template('account.html')
+
 @app.route('/edit/<int:post_id>', methods=['GET', 'POST'])
 def edit(post_id):
 	if request.method == 'POST':
@@ -93,6 +97,12 @@ if __name__ == "__main__":
 		'99 bottles of beer',
 		'wowzers@verizon.net'
 		)
+	print utils.register_new_user(
+            'Leon',
+            'plsplspls1',
+            'plsplspls1',
+            'pls@pls.com'
+            )
 	app.debug = True
 	app.secret_key = utils.secret_key
 	app.run(host="0.0.0.0", port=8000)
