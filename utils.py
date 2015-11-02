@@ -6,10 +6,10 @@ from time import gmtime, strftime
 from pymongo import MongoClient
 import sqlite3
 '''
-	Things Finished And Tested:
-	Things Finished But not Tested: Check_Login_Info, modify_password, modify_email
-	Things Partially Finished: register_new_user (Find way to check all users and emails easily)
-	Things to Finish: Everything Else, Delete Extra Comments when finished
+	Things Finished And Tested:Check_Login_Info
+	Things Finished But not Tested: modify_password, modify_email, new_post, new_comment, get_posts, get_user_posts, get_comments, get_recent_posts, modify_posts
+	Things Partially Finished:
+	Things to Finish: Post Methods, Delete Extra Comments when finished
 '''
 # a 32-byte key that should be used to secure the Flask session
 secret_key = urandom(32);
@@ -19,7 +19,7 @@ def check_login_info(username, password):
 	#Creates Connection to MongoClient and Connects to the database
 	connection = MongoClient()
 	c = connection['data']
-	print c.collection_names()
+	#print c.collection_names()
 	# If the user_info table doesn't exist, return false.
 	if not "user_info" in c.collection_names():
 			return False
@@ -164,7 +164,7 @@ def modify_email(username, password, new_email):
 def new_post(username, post, heading=''):
 	# Create the connection and cursor for the SQLite database.
 	connection = MongoClient()
-	c = connection['data.db']
+	c = connection['data']
 	# If the posts table doesn't exist, create it.
 	#q = 'CREATE TABLE IF NOT EXISTS posts \
 	#(post_id INT, user_id INT, time TEXT, heading TEXT, post TEXT)'
@@ -204,133 +204,131 @@ def new_post(username, post, heading=''):
 # enters a new comment into the database, returns comment_id or possible errors
 def new_comment(username, post_id, comment):
 	# Create the connection and cursor for the SQLite database.
-	conn = sqlite3.connect("data.db")
-	c = conn.cursor()
+	connection = MongoClient()
+	c = connection['data']
 	# If the comments table doesn't exist, create it.
-	q = 'CREATE TABLE IF NOT EXISTS comments \
-	(comment_id INT, post_id INT, user_id INT, time TEXT, comment TEXT)'
-	c.execute(q)
+	#q = 'CREATE TABLE IF NOT EXISTS comments \
+	#(comment_id INT, post_id INT, user_id INT, time TEXT, comment TEXT)'
+	#c.execute(q)
 	# Get the user_id associated with username.
-	q = 'SELECT user_id FROM user_info WHERE username = ?'
-	user_id = c.execute(q, (username,)).fetchone()[0]
+	#q = 'SELECT user_id FROM user_info WHERE username = ?'
+	user_id = c.user_info.find_one({'username':username})['user_id']
 	if not user_id:
 		'Incorrect username.'
 	# Enter the new information and return the new comment's id.
-	q = 'SELECT COUNT(*) FROM comments'
-	num_rows = c.execute(q).fetchone()[0]
-	q = 'INSERT INTO comments (comment_id, post_id, user_id, time, comment) \
-	VALUES (?, ?, ?, ?, ?)'
-	c.execute(
-		q,
-		(
-			num_rows + 1,
-			post_id,
-			user_id,
-			strftime("%a, %d %b %Y %H:%M:%S", gmtime()),
-			comment
-			)
-		)
-	conn.commit()
+	#q = 'SELECT COUNT(*) FROM comments'
+	num_rows = c.comments.count()
+	#q = 'INSERT INTO comments (comment_id, post_id, user_id, time, comment) \
+	#VALUES (?, ?, ?, ?, ?)'
+	q=
+		{'comment_id':num_rows + 1,
+			'post_id':post_id,
+			'user_id':user_id,
+			'time':strftime("%a, %d %b %Y %H:%M:%S", gmtime()),
+			'comment':comment
+			}
+	c.comments.insert(q)
 	return num_rows + 1
 
 # returns the post, heading,and timestamp from the database, or None
 def get_post(post_id):
 	# Create the connection and cursor for the SQLite database.
-	conn = sqlite3.connect("data.db")
-	c = conn.cursor()
+	connection = MongoClient()
+	c = connection['data']
 	# If the posts table doesn't exist, return None.
-	q = 'SELECT name FROM sqlite_master WHERE \
-	TYPE = "table" AND NAME = "posts"'
-	c.execute(q)
-	if not c.fetchone():
+	#q = 'SELECT name FROM sqlite_master WHERE \
+	#TYPE = "table" AND NAME = "posts"'
+	#c.execute(q)
+	if not "posts" in c.collection_names():
 		return None
 	# Return the list [post, heading, time]
 	q = 'SELECT post, heading, time FROM posts WHERE post_id = ?'
-	info = c.execute(q, (post_id,)).fetchone()
-	conn.commit()
+	info = c.posts.find_one({'post_id':post_id})
 	return info
 
 # returns the comments, usernames, times, and comment_ids from the database, or []
 def get_comments(post_id):
 	# Create the connection and cursor for the SQLite database.
-	conn = sqlite3.connect("data.db")
-	c = conn.cursor()
+	connection = MongoClient()
+	c = connection['data']
 	# If the comments table doesn't exist, return an empty list.
-	q = 'SELECT name FROM sqlite_master WHERE \
-	TYPE = "table" AND NAME = "comments"'
-	c.execute(q)
-	if not c.fetchone():
+	#q = 'SELECT name FROM sqlite_master WHERE \
+	#TYPE = "table" AND NAME = "comments"'
+	#c.execute(q)
+	if not "comments" in c.collection_name():
 		return []
 	# Return the list of lists [comment, username, time, comment_id].
-	q = 'SELECT comments, username, time, comment_id FROM comments, user_info \
-	WHERE comments.post_id = ?, user_info.post_id = ?'
-	info = c.execute(q, (post_id, post_id)).fetchall()
-	conn.commit()
+	#q = 'SELECT comments, username, time, comment_id FROM comments, user_info \
+	#WHERE comments.post_id = ?, user_info.post_id = ?'
+	info = c.comments.find_one({'post_id':post_id})
+	#conn.commit()
 	return info
 
 # returns the post_ids from the database, or []
 def get_user_posts(username):
 	# Create the connection and cursor for the SQLite database.
-	conn = sqlite3.connect("data.db")
-	c = conn.cursor()
+	connection = MongoClient()
+	c = connection['data']
 	# If the posts table doesn't exist, return an empty list.
-	q = 'SELECT name FROM sqlite_master WHERE \
-	TYPE = "table" AND NAME = "posts"'
-	c.execute(q)
-	if not c.fetchone():
+	#q = 'SELECT name FROM sqlite_master WHERE \
+	#TYPE = "table" AND NAME = "posts"'
+	#c.execute(q)
+	if not "posts" in c.collection_names():
 		return []
 	# Get the user_id associated with username.
-	q = 'SELECT user_id FROM user_info WHERE username = ?'
-	user_id = c.execute(q, (username,)).fetchone()[0]
+	#q = 'SELECT user_id FROM user_info WHERE username = ?'
+	user_id = c.user_info.find_one({'username':username})['user_id']
 	# Return the list of lists [post, heading, time, post_id]
 	q = 'SELECT post_id FROM posts WHERE user_id = ?'
-	info = [row[0] for row in c.execute(q, (user_id,)).fetchall()]
-	conn.commit()
+	info = [row[0] for row in c.posts.find({'user_id':user_id})]
+	#conn.commit()
 	return info
 
 # returns the posts, headings,and times, and post_ids from the database, or []
 def get_recent_posts():
 	# Create the connection and cursor for the SQLite database.
-	conn = sqlite3.connect("data.db")
-	c = conn.cursor()
+	connection = MongoClient()
+	c=connection['data']
 	# If the posts table doesn't exist, return an empty list.
-	q = 'SELECT name FROM sqlite_master WHERE \
-	TYPE = "table" AND NAME = "posts"'
-	c.execute(q)
-	if not c.fetchone():
+	#q = 'SELECT name FROM sqlite_master WHERE \
+	#TYPE = "table" AND NAME = "posts"'
+	#c.execute(q)
+	if not "posts" in c.collection_names():
 		return []
 	# Get the last post_id in posts.
-	q = 'SELECT COUNT(*) FROM posts'
-	num_rows = c.execute(q).fetchone()[0]
+	#q = 'SELECT COUNT(*) FROM posts'
+	num_rows = c.posts.count()
 	# Return the list of lists [post, heading, time, post_id]
-	q = 'SELECT post, heading, time, post_id FROM posts WHERE post_id > ? \
-	ORDER BY post_id DESC'
-	info = c.execute(q, (num_rows - 11,)).fetchall()
-	conn.commit()
+	#q = 'SELECT post, heading, time, post_id FROM posts WHERE post_id > ? \
+	#ORDER BY post_id DESC'
+	for x in c.posts.find({"post_id":{'$gte': num_rows-11}}):
+		info.append(x)
+	#info = c.execute(q, (num_rows - 11,)).fetchall()
+	#conn.commit()
 	return info
 
 # modifies the post in the database, returns None
 def modify_post(post_id, new_post):
 	# Create the connection and cursor for the SQLite database.
-	conn = sqlite3.connect("data.db")
-	c = conn.cursor()
+	connection = MongoClient()
+	c = connection['data']
 	# If the posts table doesn't exist, return None.
-	q = 'SELECT name FROM sqlite_master WHERE \
-	TYPE = "table" AND NAME = "posts"'
-	c.execute(q)
-	if not c.fetchone():
+	#q = 'SELECT name FROM sqlite_master WHERE \
+	#TYPE = "table" AND NAME = "posts"'
+	#c.execute(q)
+	if not "posts" in c.collection_names():
 		return None
 	# Change the old post to the new one and return None.
-	q = 'UPDATE posts SET post = ?, time = ? WHERE post_id = ?'
-	c.execute(
-		q,
-		(
-			new_post,
-			strftime("%a, %d %b %Y %H:%M:%S", gmtime()),
-			post_id
-			)
-		)
-	conn.commit()
+	#q = 'UPDATE posts SET post = ?, time = ? WHERE post_id = ?'
+	#c.execute(
+	#	q,
+	#	(
+	#		new_post,
+	#		strftime("%a, %d %b %Y %H:%M:%S", gmtime()),
+	#		post_id
+	#		)
+	#	)
+	c.posts.update({'post_id':post_id}, {"$set":{'post':new_post.,'time':strftime("%a, %d %b %Y %H:%M:%S", gmtime())}})
 	return None
 
 # modifies the comment in the database, returns None
