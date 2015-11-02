@@ -1,3 +1,7 @@
+{% extends "master.html" %}
+{% block title %}Edit Post{% endblock %}
+
+{% block body %}
 <h1>Edit Post</h1>
 <h2>Welcome, {{session['username']}}</h2>
 <button>
@@ -14,3 +18,4 @@
 <form method="post">
 	<p><input type="submit" name="delete" value="Delete"></p>
 </form>
+{% endblock %}
